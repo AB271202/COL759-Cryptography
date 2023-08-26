@@ -32,7 +32,7 @@
 \usepackage[shortlabels]{enumitem}
 \usepackage{indentfirst}
 \usepackage{hyperref}
-    
+\usepackage[capitalize, nameinlink]{cleveref}
 \renewcommand{\thesubsection}{\thesection.\alph{subsection}}
 
 \newenvironment{problem}[2][Problem]
@@ -47,7 +47,7 @@
 \newcommand{\hr}{\noindent\rule{7in}{2.8pt}}
 \newenvironment{solution}
     {\textit{Solution:}}
-    {\hr}
+    {\clearpage}
 \newcommand{\prob}[1]{\begin{mdframed}[backgroundcolor=gray!20] \textbf{Problem #1}\end{mdframed}}
 \renewcommand{\qed}{\quad\qedsymbol}
 \newcommand{\bit}{\left\{0, 1\right\}}
@@ -137,17 +137,23 @@
         \item PRGs
         \begin{enumerate}[i.]
             \item $\calG' = \set{G'_n : \bit^{2n} \to \bit^{3n}}_{n \in \N}$, where $$ G'_n(s_1 ~||~ s_2) = G_n(s_1) \wedge G_n(s_2).$$ 
-            \item $\calG' = \set{G'_n : \bit^{2n} \to \bit^{3n}}_{n \in \N}$, where $$ G'_n(s_1 ~||~ s_2) = G_n(s_1) \oplus G_n(s_2).$$
+            The given PRG is \textbf{insecure}. As discussed in class and Quiz 2, a secure PRG $G$ can disclose some of the bits of the seed $s$. For convenience we take $n$ to be even but a similar logic can be used for the odd case too. Suppose $G:\bit^n\rightarrow\bit^{3n}$ is such that it reveals the first $n/2$ of its bits: $$G(s_1 ~||~ s_2)=s_1 ~||~ G''(s_2)$$ where $G'':\bit^{n/2}\rightarrow\bit^{5n/2}$ is a secure PRG. It can be proved that $G$ is secure if $G''$ is secure. Now, 
+            $$G'(s_1 ~||~ s_2)=G_n(s_{11} ~||~ s_{12}) \wedge G_n(s_{21} ~||~ s_{22})=s_{11}\wedge s_{21} ~||~ G''(s_{12})\wedge G''(s_{22})$$
+            which reveals the bits of  $s_{11}\wedge s_{21}$. The advantage of the adversary which exploits this will be close to 1.
+
+            %%%%%%%%%%%%%%%%%%%%%%%%% TODO
+
+            \item $\calG' = \set{G'_n : \bit^{2n} \to \bit^{3n}}_{n \in \N}$, where $$ G'_n(s_1 ~||~ s_2) = G_n(s_1) \oplus G_n(s_2).$$  
         \end{enumerate}
         \item PRFs
         \begin{enumerate}[i.]
             \item $\calF' = \set{F'_n:\bit^{n} \times \bit^{2n} \to \bit^{n}}_{n\in \N}$ where $$F'_n(k, (x_1, x_2)) = F_n(k, x_1) \oplus F_n(k, x_2).$$  
             
-            The given family $\calF'$ is \textbf{insecure}. Consider a PPT attacker $\calA$ who sends $\poly(\lambda)$ distinct $(x_i,x_i)$ queries to the  challenger. If the challenger chooses $b=0$ then it will end up sending $$F_n(k, x_i) \oplus F_n(k, x_i)=0^n$$ for each of the queries. The attacker outputs 0 if all the responses are 0 and 1 otherwise. Advantage of the attacker is close to 1.
+            The given family $\calF'$ is \textbf{insecure}. Consider a PPT attacker $\calA$ who sends $\poly(\lambda)$ distinct $(x_i,x_i)$ queries to the  challenger. If the challenger chooses $b=0$ then it will end up sending $$F_n(k, x_i) \oplus F_n(k, x_i)=0^n$$ for each of the queries. The attacker outputs 0 if all the responses are 0 and 1 otherwise. Advantage of the attacker is close to 1, precisely $1-2^{-n\poly(\lambda)}$.
 
             \item $\calF' = \set{F'_n:\bit^{n} \times \bit^{n} \to \bit^{n}}_{n\in \N}$ where $$F'_n(k, x) = F_n(k, x) \oplus x.$$
             
-            The given family is secure. Given an adversary $\calA$ which breaks PRF security of $\calF'$, we can construct an adversary $\calB$ which breaks the security of $\calF$.
+            The given family is secure. Given an adversary $\calA$ which breaks PRF security of $\calF'$, we can construct an adversary $\calB$ which breaks the security of $\calF$ (\cref{red:p2bii})
             \securitygame{Problem 2(b)(ii)}{Reduction for Problem 2(b)(ii)}{\label{red:p2bii}}
     {
         \begin{itemize}
@@ -171,7 +177,16 @@
 
 \prob{4 : Constructing PRFs from PRGs}
 \begin{solution}
-
+    We will use a tree construction similar to the one given in the book for proving (\cref{fig:TC})
+    \begin{figure}[!ht]
+        \centering
+        \includegraphics[scale=0.5]{images/Tree Construction.png}
+        \caption{Tree construction in the book}
+        \label{fig:TC}
+    \end{figure}
+\begin{enumerate}[(a)]
+    \item  Construct $\log n$ hybrid worlds in the following way: in Hybrid world $j$, the challenger samples $2^j$ random bitstrings $s_1, s_2,s_3\dots s_j \gets \bit^n$. Then it applies 
+\end{enumerate}
 \end{solution} 
 
 
