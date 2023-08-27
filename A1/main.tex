@@ -113,7 +113,7 @@
 % the third arg is the game description
 % the label needs to be included 
 \newcommand{\securitygame}[4]{
-   \pprotocol{#1}{#2}{tbh!}{#3}{#4}
+   \pprotocol{#1}{#2}{ht!}{#3}{#4}
 }
 
 \newcommand{\constr}[4]{
@@ -206,24 +206,56 @@
     We will use a tree construction similar to the one given in the book (\cref{fig:TC})
     \begin{figure}[!ht]
         \centering
-        \includegraphics[scale=0.75]{images/Tree Construction.png}
-        \caption{Tree construction in the book}
+        \includegraphics[scale=0.25]{images/Tree Construction.png}
+        \caption{Construction of Hybrid worlds for the case $\log n=3$. The randomly generated nodes are shadedand the nodes which can be ignored are dotted}
         \label{fig:TC}
     \end{figure}
     \begin{enumerate}[(a)]
-        \item  Construct $\log n$ hybrid worlds in the following way: In Hybrid $j$, the challenger    builds an evaluation tree whose nodes are labeled as follows:
+        \item  Construct $n$ hybrid worlds in the following way: In Hybrid $j$, the challenger builds an evaluation tree whose nodes are labeled as follows:
               \begin{itemize}
-                  \item nodes at levels $0$ through $j$ are assigned random labels
-                  \item the nodes at levels $j + 1$ through $\log n$ are assigned derived labels
+                  \item The first $j$ nodes (as appearing in the level order traversal of the tree) can be ignored.
+                  \item The next $j + 1$ nodes are labelled with random values. 
+                  \item Remaining nodes are derived from their parents.
               \end{itemize}
-              In response to a query $x\in\bit^{\log n}$ in Hybrid $j$, the challenger sends to the adversary the label of
-              the leaf addressed by $x$.
+              In response to a query $x\in\bit^{\log n}$ in Hybrid $j$, the challenger sends to the adversary the label of the leaf addressed by $x$.
 
               Observe that Hybrid $0$ corresponds to the case $b=0$ in the PRF game when the challenger sends $F_k(x)$ and Hybrid $l$ corresponds to $b=1$ when the challenger uses a truly random function.
 
               \paragraph{Claim:} If there exists an adversary $\calA$ which can distinguish between Hybrid $i$ and Hybrid $i+1$ then we can construct an adversary $\calB$ which breaks the PRG security of $G$.
 
-        \item The construction of the tree in above case will take $O(2^{\log n})=O(n)$ time.
+              \textit{Proof:} Consider the reduction \cref{red:p4a}
+
+              \securitygame{Problem 4(a)}{Reduction for Problem 4(a)}{\label{red:p4a}}
+              {
+                  \begin{itemize}
+                      \item Challenger picks a uniformly random bit $b \gets \bit$ and a seed $s\gets \bit^n$. If $b=0$, he sends $y=G(s)$ to $\calB$ otherwise he sends a $y=r\gets\bit^{2n}$.
+                      \item $\calB$ constructs the evaluation tree. 
+                      \begin{itemize}
+                        \item The first $i+1$ nodes can be ignored
+                        \item The next $i$ nodes are randomly generated
+                        \item The next two nodes are made by splitting $y$ sent by the challenger into two halves
+                        \item Remaining nodes are generated using the algorithm from their parents.
+                      \end{itemize} 
+                      \item The adversary $\calA$ makes polynomially many queries to $\calB$. In response to a query $x\in\bit^{\log n}$, $\calB$ sends the label of the leaf addressed by $x$ (This traveral is shown in the HybridWorld0 of \cref{red:p4a})
+                      \item After polynomially many queries, $\calB$ forwards the response send by $\calA$ $(b')$ and wins if $b=b'$.
+                  \end{itemize}
+              }
+              \begin{figure}[!ht]
+                \centering
+                \includegraphics[scale=0.25]{images/Tree Red.png.jpg}
+                \caption{Reduction for distinguishing between HybridWorld2 and HybridWorld3}
+                \label{fig:p4a2}
+              \end{figure}
+
+
+                  From the construction, it can be checked that:
+                  $$\Pr[b'=0|b=0]=\Pr[\calA\text{ outputs 0 in HybridWorld } i]=p_{i}$$
+                  $$\Pr[b'=0|b=0]=\Pr[\calA\text{ outputs 0 in HybridWorld } i+1]=p_{i+1}$$
+                  Thus,
+                  $$\prg[\calB,\calG]=|p_{i}-p_{i+1}|$$
+                  Finally for the combined reduction, we choose any one of the reductions at random.
+                  $$\prg[\calB^c,\calG^c]=\frac{|p_{l}-p_{0}|}{\log n}$$
+        \item In the above construction, $\calB$ will need to sample $O(2^d)$ random bitstrings in some hybrids, where $d$ is the depth of the tree. If $d=\log n$ then $\calB$ samples $O(n)$ bitstrings. However, if $d=n$ then he has to sample exponentially many strings, making him inefficient. So, we cannot use the same reduction when $x\in\bit^n$.
         \item The given construction is insecure. Consider an adversary $\calA$ which plays the following game $\calG$:
               \begin{itemize}
                   \item $\calA$ sends $x$ to the Challenger and receives $y_1$
