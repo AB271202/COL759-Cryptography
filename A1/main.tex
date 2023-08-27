@@ -147,7 +147,7 @@
                         and
                         $$\Pr[b'=0|b=1]=1/2$$
                         Thus the $\prg[\calA,\calG]\approx1/4$ which is non-negligible.
-                        
+
                   \item $\calG' = \set{G'_n : \bit^{2n} \to \bit^{3n}}_{n \in \N}$, where $$ G'_n(s_1 ~||~ s_2) = G_n(s_1) \oplus G_n(s_2)$$
                         This is a \textbf{secure} PRG. We prove the security by a hybrid argument.
                         \begin{itemize}
@@ -179,7 +179,7 @@
 
                   \item $\calF' = \set{F'_n:\bit^{n} \times \bit^{n} \to \bit^{n}}_{n\in \N}$ where $$F'_n(k, x) = F_n(k, x) \oplus x.$$
 
-                        The given family is secure. Given an adversary $\calA$ which breaks PRF security of $\calF'$, we can construct an adversary $\calB$ which breaks the security of $\calF$ (\cref{red:p2bii})
+                        The given family is \textbf{secure}. Given an adversary $\calA$ which breaks PRF security of $\calF'$, we can construct an adversary $\calB$ which breaks the security of $\calF$ (\cref{red:p2bii})
                         \securitygame{Problem 2(b)(ii)}{Reduction for Problem 2(b)(ii)}{\label{red:p2bii}}
                         {
                             \begin{itemize}
