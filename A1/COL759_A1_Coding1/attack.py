@@ -7,27 +7,6 @@ You can implement helper function here if you want
 def FEL(plaintext):
     return len(encrypt(plaintext))
 
-# def recattack(secret,lim,amt):
-
-#     if lim==0:
-#         return amt,secret
-#     minm=FEL(secret+chr(97))
-#     index=0
-#     arr=[]
-#     for i in range(26):
-#         l=FEL(secret+chr(97+i))
-#         # print(l)
-#         if l<minm:
-#             minm=l
-#             index=i
-
-#     for i in range(26):
-#         l=FEL(secret+chr(97+i))
-#         if l==minm:
-#             arr.append(recattack(secret+chr(97+i),lim-1, minm))
-#     return min(arr)
-#     # secret+=chr(97+index)    
-
 def getmin(secret,arr):
     '''
     Returns the minimum secret with one character more, 
@@ -37,7 +16,6 @@ def getmin(secret,arr):
     minm=FEL(secret+chr(97))
     for i in range(26):
         l=FEL(secret+chr(97+i))
-        # print(l)
         if l<=minm:
             minm=l
             index=i
@@ -63,9 +41,7 @@ def attack():
         else:
             newarr=[]
             for i in range(len(arr)):
-                # print(arr)
                 arr2=[]
-                # x=arr.pop()
                 minm,index = getmin(arr[i],arr2)
                 if newarr==[] or minm<newarr[-1][0]:
                     newarr=[(minm, arr2)]
@@ -74,18 +50,14 @@ def attack():
             arr=[]
             for i in range(len(newarr)):
                 arr.extend(newarr[i][1])
-            secret=arr[0] #NOTE HERE
+            secret=arr[0]
             some+=2
-        # print(some, arr)
         
     """
     Return the secret
     """
-    # amt,secret=recattack("",24,FEL(secret+chr(97)))
     return secret
 
 if __name__=="__main__":
     print(attack())
-    print(FEL("zzzzzzzzzzzzzzzzzzzzzzzzaa"))
-    print(FEL("zzzzzzzzzzzzzzzzzzzzzzzzzz"))
     
