@@ -130,7 +130,44 @@
 
 \prob{1: Perfect 2 time security}
 \begin{solution}
+        \begin{enumerate}[(a)]
+        \item Consider an Adversary $\calA$ that sends challenger the following pairs of messages : $(m_{00}, m_{01})$ and $(m_1, m_1)$. If the Encryption Scheme $\calE$ were to be deterministic, the challenger would send either a pair of two distinct ciphertexts (in case it encrypts the first pair, i.e. b = 0) or a pair of two same ciphtertexts (in case it encrypted the second pair, i.e. b = 1). In this scenario, $\calA$ would break the Encryption Scheme $\calE$ with surety.\\
+        But we can have randomized encryption shcemes with randomness drawn from $\bit^{l_3}$. Still there is a non-zero probability of $\frac{1}{2^{l_3}}$ of the two random strings selected to be same and thus the cipher texts will turn out to be same for two same messages. 
 
+        \item The encryption scheme $\calE = (Enc, Dec)$ which satisfies $ O(2^{-l}) $-perfect-two-time Security can be constructed as follows:
+        \begin{center}
+            $Enc(k, m, r) = (r, m \oplus h_k(r))$ and \\
+            $Dec(k, (ct_0, ct_1)) = ct_1 \oplus h_k(ct_0) $ \\ 
+            where $r$ is a random string sampled from the Random space.
+            
+        \end{center}
+        To prove its security first consider the given PIF security game between a challenger $\calC$ and adversary $\calA$ (adversary can be inefficient):
+        \begin{center}
+            \textbf{PIF Security Game}
+            \begin{itemize}
+                \item The challenger samples uniformly a bit $b \gets \bit$ and a key $k \gets \calK$. 
+                \item The adversary then sends two queries $x_0$ and $x_1$ to the challenger. If $b = 0$ then the challenger computes $h_k(x_0)$ and $h_k(x_1)$ and sends them to $\calA$. Else it samples uniformly a random function $f$ with input and output space as $\bit^{l} \rightarrow \bit^{l}$ and outputs $f(x_0)$ and $f(x_1)$.
+                \item The adversary sends a bit $b'$ to the challenger.
+            \end{itemize}
+        \end{center}
+        We claim that if $h_k$ is a Pairwise Independent Hash Function(PIF) then winning probability of $\calA$ in the above security game will be $\frac{1}{2}$. \\
+        \textit{Proof} : We will prove the contrapositive. Suppose an adversary $\calA$ has non-zero advantage in the above PIF Game. $\calA$ performs the following : For every $k \in \calK$, it checks whether $h_k(x_0) = y_0 \And h_k(x_1) = y_1$ where $y_0$ and $y_1$ are the outputs sent by the challenger. If it finds such $k$, then $\calA$ sends $0$ to the challenger else it sends 1. \\ 
+        Now $PIFAdv[\calA] = \Big| Pr[b'=0|b=0]-Pr[b'=0|b=1] \Big| $ which is non-zero.\\
+        Also $Pr[b'=0|b=0] = Pr[h_k(x_0) = y_0 \land h_k(x_1) = y_1]$
+        and $Pr[b'=0|b=1]$ will be the same as getting two random strings of length l same as $h_k(x_0)$ and $h_k(x_1)$ which will be $\frac{1}{2^{2l}}$. So this implies that $Pr[h_k(x_0) = y_0 \land h_k(x_1) = y_1] \ne \frac{1}{2^{2l}}$ for some distinct $x_0$ and $x_1$ and $y_0$ and $y_1$. So this implies that $h_k$ is not a PIF.\\
+
+        Now we need to prove that our construction which uses $\calH$ function family is almost perfect two time secure. We will prove the contra-positive that if there exists a ppt. adversary $\calA$ that breaks the security of our encryption scheme $\calE$ then the function family $\calH$ is not PIF, i.e., there exists a reduction algorithm $\calB$ that breaks the PIF security game. To prove this consider the following worlds: 
+        \begin{itemize}
+            \item \textbf{World-b} : Challenger encrypts message $m_b = (m_{b0}, m_{b1})$ and sends $ct = (ct_0, ct_1)$ to the adversary where $ct_0 = (r_0, Enc(k, m_{b0}, r_0))$ and $ct_1 = (r_1, Enc(k, m_{b1}, r_1))$. Let $p_b$ be the probability that $\calA$ outputs 0 in World-b.
+            \item \textbf{Hybrid-World-b} : Challenger encrypts message  $m_b = (m_{b0}, m_{b1})$ by sampling a random function $f$ from the given input-output space and sends $ct = (ct_0, ct_1)$ to the adversary where $ct_0 = (r_0, m_{b0} \oplus f(r_0)$ and $ct_1 = (r_1, m_{b1} \oplus f(r_1)$. Let $p_{hyb,b}$ be the probability that $\calA$ outputs 0 in Hybrid-World-b.
+        \end{itemize}
+
+        Now given that $|p_0 - p_1|$ is non negligible, we can say that either $|p_0 - p_{hyb,0}|$ or $|p_1 - p_{hyb,1}|$ is non-negligible. Note that $p_{hyb,0}$ and $ p_{hyb,1}$ are negligibly far apart (because of part(a)).
+
+        \textbf{Observation} : There exists a reduction algorithm $\calB_i$ such that PIFAdv[$\calB$] = $|p_i - p_{hyb,i}|$. (where i = 0 or 1) \\
+        \textit{Proof} : The algorithm $\calB_i$ samples two random strings $r_0$ and $r_1$ and sends them to the PIF challenger. It receives $m_0$ and $m_1$ from A and $f(r_0)$ and $f(r_1)$ from challenger. Now it sends $m_{i0} \oplus f(r_0)$ and $m_{i1} \oplus f(r_1)$. If f is a PIF function, then that corresponds to World-i for $\calA$ else it corresponds to Hybrid-World-i. So we can thereby say that the advantage of $\calB$ = $|p_i - p_{hyb,i}|$.
+        
+    \end{enumerate}
 \end{solution}
 
 
@@ -197,7 +234,44 @@
 
 \prob{3 : PRG Security does not imply Related-Key-PRG Security}
 \begin{solution}
+    \begin{enumerate}[(a)]
+        \item The construction of $\calG'$ from $\calG$ is as follows :\\ 
+        $\calG' = \left\{ G'_n : \bit^{2n} \gets \bit^{6n} \right\}_{n \in \N }$ where $G'_n(s) = G(s_0) \:||\: G(s_1)$ where $s_0$ and $s_1$ are the first n bits and the last n bits of s respectively and $||$ denotes join(append) operation.
 
+        \item The following related key attack can be launched against our length-expanding function $\calG'$ :
+        \begin{itemize}
+            \item In our Related-key attack game, the challenger picks uniformly a bit $b \gets \bit$ and a seed $s \gets \bit^{2n}$.
+            \item The adversary $\calA$ makes two queries to the challenger. If $b = 1$, it picks a uniformly random string $y \gets \bit^{6n}$ in each query and sends it to $\calA$. Else it computes $G'(s)$ and $G'(s+1)$ and sends it to $\calA$. Let the two strings sent by the challenger to the adversary be $y_1$ and $y_2$.
+            \item The adversary checks whether the first $3n$ bits of $y_1$ are equal to the first $3n$ bits of $y_2$ or not. If that's the case, then $\calA$ sends $0$ to the challenger else it sends $1$ to the challenger.
+        \end{itemize}
+        We can show that this adversary $\calA$ wins the related-key security game with a non-negligible advantage. This is because if $s = s_0 || s_1$ then $s+1 = s_0 || (s_1+1)$ unless $s_1 = 1^n$. Meaning the first n bits remain same in most of the cases after adding 1 to our 2n bit string $s$. Since $G'_n(s) = G(s_0) \:||\: G(s_1)$ and $G'_n(s+1) = G(s_0) \:||\: G(s_1+1)$, the first 3n bits will be the same in both the strings and hence the adversary can guess whether the strings sent by the challenger are psuedorandom or completely random.\\
+        This will be the case for all but $2^n$ seeds $s$ out of total $2^{2n}$ possible seeds $s$ (where the last n bits of $s$ are $1^n$). So for all these $2^{2n} - 2^n$ seeds, the adversary $\calA$ can guess $b'$ with surety. $\calA$ will incorrectly send $0$ only on the $2^n$ seeds with last n bits $1^n$. Also it may happen that when challenger chooses $b=1$ and samples two uniformly random $6n$ bits, they may have first $3n$ bits same. So the advantage of $\calA$ in the related-key security game is : \\
+        \begin{center}
+            $RKAdv[\calA, \calG'] = Pr[b'=0|b=0] - Pr[b'=0|b=1]$
+        \end{center}
+        where $Pr[b'=0|b=0]$ is $ \frac{2^{2n} - 2^n}{2^{2n}} $ which is same as $\frac{1}{2^n}$.
+        and $Pr[b'=0|b=1]$ is $\frac{1}{2^{3n}}$ which is much lesser. \\
+        So winning probability of $\calA$ is approximately $1+ \frac{1}{2^n}$
+
+        \item Consider the following worlds, World-0, World-1 and Hybrid-World, in the PRG security game $wrt$ $G'$ and a ppt. adversary $\calA$ : 
+        \begin{itemize}
+            \item \textbf{World-0} : Challenger sends $G'(s)$ to $\calA$, where $s$ is sampled uniformly from $\bit^{2n}$. Let $Pr[b'=0] = p_0$ in World-0. 
+            \item  \textbf{World-1} : Challenger sends a random $y 
+        \gets \bit^{6n}$ to $\calA$. Let $Pr[b'=0] = p_1$ in World-1.
+            \item \textbf{Hybrid-World} : Challenger samples a seed $s \gets \bit^n$ and a random string $y' \gets \bit^{3n}$ and sends $G(s)||y'$ to $\calA$. Let $Pr[b'=0] = p_{hyb}$ in Hybrid-World.
+        \end{itemize}
+        We will show that if A breaks the PRG security of $\calG'$ then there exists a ppt. reduction algorithm $\calB$ such that $\calB$ breaks the PRG security of $\calG$ using $\calA$. This means we that $|p_0 - p_1| = \epsilon$, where $\epsilon$ is non-negligible. So this follows that either $|p_0 - p_{hyb}| >= \epsilon/2 $ or $|p_1 - p_{hyb}| >= \epsilon/2 $, in either case we can find a reduction algorithm $\calB$ such that B breaks PRG security of $\calG$.\\ 
+
+        \textbf{Observation 1 : } There exists a reduction algorithm $B_0$ such that $PRGAdv[B_0, G] = |p_0 - p_{hyb}|$. 
+        \textit{Proof} : The reduction algorithm $B_0$ receives a 3n bit string $y$ from the PRG challenger and samples a uniformly random seed $s \gets \bit^n$ and computes $G(s)$. It sends $G(s)||y$ to adversary $\calA$. Now if $y$ is pseudorandom then that corresponds to World-0 for $\calA$ whereas if $y$ is completely random, then that corresponds to Hybrid-World for $\calA$. So if $b' =0$ then $B_0$ sends $0$ to the challenger indicating pseudorandom else it sends $1$. \\
+        Pr[$B_0$ sends $0$ $\mid$ Challenger chooses $0$] = Pr[$\calA$ sends 0 in World-0] = $p_0$ \\
+        Pr[$B_0$ sends $0$ $\mid$ Challenger chooses $1$] = Pr[$\calA$ sends 0 in Hybrid-World] = $p_{hyb}$ \\
+
+        \textbf{Observation 2 : } There exists a reduction algorithm $B_1$ such that $PRGAdv[B_1, G] = |p_1 - p_{hyb}|$. 
+        \textit{Proof} : The reduction algorithm $B_1$ receives a 3n bit string $y$ from the PRG challenger and samples a uniformly random sring $y' \gets \bit^{3n}$. It sends $y||y'$ to adversary $\calA$. Now if $y$ is pseudorandom then that corresponds to Hybrid-World for $\calA$ whereas if $y$ is completely random, then that corresponds to World-1 for $\calA$. So if $b' =0$ then $B_1$ sends $0$ to the challenger indicating pseudorandom else it sends $1$. \\
+        Pr[$B_1$ sends $0$ $\mid$ Challenger chooses $0$] = Pr[$\calA$ sends 0 in World-1] = $p_1$ \\
+        Pr[$B_0$ sends $0$ $\mid$ Challenger chooses $1$] = Pr[$\calA$ sends 0 in Hybrid-World] = $p_{hyb}$ \\
+    \end{enumerate}
 \end{solution}
 
 
