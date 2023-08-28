@@ -361,7 +361,7 @@
         Thus the $\prf[\calA,\calG]=1-2^{-n}$
         \item The main problem in the above scheme occurs when one of the queries by the adversary is a proper prefix of the other. To avoid this, we modify the scheme by first applying a PRG on the query $x$. Let $\calG' = \{G'_n: \bit^n\rightarrow\bit^{l(n)}\}_{n\in\N}$ be a secure PRG family where $l(n)$ is poly-bounded. In the scheme, the challenger first applies $G'_n$ on the input $x$ sent by the adversary and then uses the tree construction replacing $x\mapsto G'_n(x)$.
         
-        The main intuition behind this construction is that for an \textit{efficient} adversary, it should be difficult to find $x_1,x_2, |x_1|=n_1<n_2=|x_2|$ such that $G'_{n_1}(x_1)$ is a proper prefix of $G'_{n_2}(x_2)$. Then we can use Theorem 4.11 of the book which states that \textit{``If G is a secure PRG, then the variable length tree construction derived from G is a prefix-free secure PRF''}
+        The main intuition behind this construction is that for an \textit{efficient} adversary, it should be difficult to find $x_1,x_2, |x_1|=n_1<n_2=|x_2|$ such that $G'_{n_1}(x_1)$ is a proper prefix of $G'_{n_2}(x_2)$. Then we can use Theorem 4.11 of the book which states that \textit{``If G is a secure PRG, then the variable length tree construction derived from G is a prefix-free secure PRF''}. So, this scheme is plausibly secure.
     \end{enumerate}
 \end{solution}
 
