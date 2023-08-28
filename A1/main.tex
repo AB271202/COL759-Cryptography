@@ -131,24 +131,54 @@
 \prob{1: Perfect Two-time Security}
 \begin{solution}
     \begin{enumerate}[(a)]
-        \item Consider an Adversary $\calA$ that sends challenger the following pairs of messages : $(m_{00}, m_{01})$ and $(m_1, m_1)$. If the Encryption Scheme $\calE$ were to be deterministic, the challenger would send either a pair of two distinct ciphertexts (in case it encrypts the first pair, i.e. b = 0) or a pair of two same ciphtertexts (in case it encrypted the second pair, i.e. b = 1). In this scenario, $\calA$ would break the Encryption Scheme $\calE$ with surety.\\
-        But we can have randomized encryption shcemes with randomness drawn from $\bit^{l_3}$. Still there is a non-zero probability of $\frac{1}{2^{l_3}}$ of the two random strings selected to be same and thus the cipher texts will turn out to be same for two same messages. So the adversary performs the following : 
-        \begin{itemize}
-            \item The adversary sends two messages $(m_{00}, m_{01})$ and $(m_1, m_1)$ and receives cipher text pair $(ct_0, ct_1)$ along with the random strings.
-            \item The adversary checks whether $ct_0 = ct_1$ under the constraint that the random strings are same. If that's the case, then $\calA$ guesses $b' = 1$ else it sends $b' = 0$.
-        \end{itemize}
-        The winning probability of $\calA$ in this scenario would be $\frac{1}{2} + \frac{1}{2^{l_3 + 1}}$. (NOTE: Two distinct messages can't have same ciphers with same random strings and two same messages with different random strings will not have the same cipher text. So Adv[$\calA$] = $ \Big| Pr[b'=1|b=0] - Pr[b'=1|b=1] \Big| $, where $Pr[b'=1|b=0] = \frac{1}{2^{l_3}}$ and $Pr[b'=1|b=1] = 0$)\\
-
+        \item Consider an Adversary $\calA$ that sends challenger the following pairs of messages : $(m_{00}, m_{01})$ and $(m_1, m_1)$. If $\calE$ were to be deterministic, the challenger would send either a pair of distinct ciphertexts (in case it encrypts the first pair, i.e. b = 0) or a pair of identical ciphtertexts (in case it encrypted the second pair, i.e. b = 1). In this scenario, $\calA$ would break the Encryption Scheme $\calE$ with certainity.
         
-        Even if the encryption scheme is such that it samples only distinct random strings for encryption, still there is non-zero probability of two different messages having the same cipher-texts. Note that two different messages can't have the same ciphers as this would lead to ambiguity in decryption. So in this case the adversary remains the same with only difference that it outputs 1 if $ct_0 = ct_1$ irrespective of random strings. In this case $Pr[b'=1|b=0] = 0$ (because two same messages with different random strings will not have the same cipher text.) and $Pr[b'=1|b=1] = \frac{1}{2^{l_3}}$. So Adv[$\calA$] = $ \Big| Pr[b'=1|b=0] - Pr[b'=1|b=1] \Big| = \frac{1}{2} + \frac{1}{2^{l_3 + 1}}$
+        But we can have randomized encryption schemes with randomness drawn from $\bit^{l_3}$. Still there is a non-zero probability of ${2^{-l_3}}$ of the two random strings selected to be same and thus the cipher texts will turn out to be same for two same messages. So the adversary performs the following : 
+        
+        \begin{itemize}
+            \item The adversary sends two messages $(m_{00}, m_{01}), m_{00}\neq m_{01}$ and $(m_1, m_1)$ and receives ciphertext pair $(ct_0, ct_1)$ from the challenger.
+            \item The adversary checks whether $ct_0 = ct_1$. If so, then $\calA$ guesses $b' = 1$ else it sends $b' = 0$.
+        \end{itemize}
+        Now, the advantage of $\calA$ will be:
+        $$\mathsf{Adv}[\calA, \calG] =  \Big| \Pr[b'=1|b=0] - \Pr[b'=1|b=1] \Big| $$
+        When b=0, the probability that two distinct messages get mapped to the same ciphertext using the same key is zero. Otherwise, we cannot decrypt it.
+        $$\Pr[b'=1|b=0]=0$$
+        On the other hand, when b=1, 
+        $$\Pr[b'=1|b=1]\geq\Pr[b'=1|b=1, r_1=r_2]\Pr[r_1=r_2]=\frac{1}{2^{l_3}}$$ 
+        where $r_1$ and $r_2$ are the random numbers used for the two encryptions. So the advantage is non-zero:
+        $$\mathsf{Adv}[\calA,\calG] \geq 2^{-l_3}  $$
+        And the winning probability is more than $1/2$:
+        $$\Pr[\text{Adversary wins}]=\frac12+\frac12\mathsf{Adv}[\calA,\calG] \geq\frac{1}{2} + \frac{1}{2^{l_3 + 1}}$$
+        Note that in the above derivation, we assumed that $r$ was sampled uniformly at random. Even if it were taken from some other distribution then too that probability will be non-zero.
 
-        \item The encryption scheme $\calE = (Enc, Dec)$ which satisfies $ O(2^{-l}) $-perfect-two-time Security can be constructed as follows:
-        \begin{center}
-            $Enc(k, m, r) = (r, m \oplus h_k(r))$ and \\
-            $Dec(k, (ct_0, ct_1)) = ct_1 \oplus h_k(ct_0) $ \\ 
+        \hr
+        
+        \textit{(Aside)}Here is another construction which doesn't take into account the distribution of $r$:
+        \begin{itemize}
+            \item The adversary sends two messages $(m_{00}, m_{01})$ and $(m_1, m_1)$, none of $m_{00},m_{01},m_1$ are equal, and receives ciphertext pair $(ct_0, ct_1)$ from the challenger.
+            \item The adversary decrypts the received ciphertexts with a random key. If he finds that $\dec(k,ct_0)=\dec(k,ct_1)=m_1$, then $\calA$ guesses $b' = 1$ else it sends $b' = 0$.
+        \end{itemize}
+        $$\Pr[b'=1|b=0]\approx0$$
+        On the other hand, when b=1, 
+        $$\Pr[b'=1|b=1]=2^{-l_2}$$
+        Which gives a non-zero advantage.
+        % The winning probability of $\calA$ in this scenario would be:
+        %  $$\Pr[\text{Adversary wins}]=\frac{1}{2} + \frac{1}{2^{l_3 + 1}}$$. 
+         
+        %  NOTE: Two distinct messages can't have same ciphers with same random strings and two same messages with different random strings will not have the same cipher text. So,
+        %   $$\mathsf{Adv}[\calA] =  \Big| \Pr[b'=1|b=0] - \Pr[b'=1|b=1] \Big| $$ 
+        %   where 
+        %   $$Pr[b'=1|b=0] = \frac{1}{2^{l_3}}$$ 
+        %   and 
+        %   $$Pr[b'=1|b=1] = 0$$
+        
+        % Even if the encryption scheme is such that it samples only distinct random strings for encryption, still there is non-zero probability of two different messages having the same cipher-texts. Note that two different messages can't have the same ciphers as this would lead to ambiguity in decryption. So in this case the adversary remains the same with only difference that it outputs 1 if $ct_0 = ct_1$ irrespective of random strings. In this case $Pr[b'=1|b=0] = 0$ (because two same messages with different random strings will not have the same cipher text.) and $Pr[b'=1|b=1] = \frac{1}{2^{l_3}}$. So 
+        % $$\mathsf{Adv}[\calA] =  \Big| Pr[b'=1|b=0] - Pr[b'=1|b=1] \Big| = \frac{1}{2} + \frac{1}{2^{l_3 + 1}}$$
+
+        \item The encryption scheme $\calE = (\enc, \dec)$ which satisfies $ O(2^{-l}) $-perfect-two-time Security can be constructed as follows:
+            $$\enc(k, m, r) = (r, m \oplus h_k(r))$$ and
+            $$\dec(k, (ct_0, ct_1)) = ct_1 \oplus h_k(ct_0) $$
             where $r$ is a random string sampled from the Random space.
-            
-        \end{center}
         To prove its security first consider the given PIF security game between a challenger $\calC$ and adversary $\calA$ (adversary can be inefficient):
         \begin{center}
             \textbf{PIF Security Game}
@@ -160,14 +190,14 @@
         \end{center}
         We claim that if $h_k$ is a Pairwise Independent Hash Function(PIF) then winning probability of $\calA$ in the above security game will be $\frac{1}{2}$. \\
         \textit{Proof} : We will prove the contrapositive. Suppose an adversary $\calA$ has non-zero advantage in the above PIF Game. $\calA$ performs the following : For every $k \in \calK$, it checks whether $h_k(x_0) = y_0 \And h_k(x_1) = y_1$ where $y_0$ and $y_1$ are the outputs sent by the challenger. If it finds such $k$, then $\calA$ sends $0$ to the challenger else it sends 1. \\ 
-        Now $PIFAdv[\calA] = \Big| Pr[b'=0|b=0]-Pr[b'=0|b=1] \Big| $ which is non-zero.\\
+        Now $$\mathsf{PIFAdv}[\calA] = \Big| Pr[b'=0|b=0]-Pr[b'=0|b=1] \Big|$$ which is non-zero.
         Also $Pr[b'=0|b=0] = Pr[h_k(x_0) = y_0 \land h_k(x_1) = y_1]$
         and $Pr[b'=0|b=1]$ will be the same as getting two random strings of length l same as $h_k(x_0)$ and $h_k(x_1)$ which will be $\frac{1}{2^{2l}}$. So this implies that $Pr[h_k(x_0) = y_0 \land h_k(x_1) = y_1] \ne \frac{1}{2^{2l}}$ for some distinct $x_0$ and $x_1$ and $y_0$ and $y_1$. So this implies that $h_k$ is not a PIF.\\
 
         Now we need to prove that our construction which uses $\calH$ function family is almost perfect two time secure. We will prove the contra-positive that if there exists a ppt. adversary $\calA$ that breaks the security of our encryption scheme $\calE$ then the function family $\calH$ is not PIF, i.e., there exists a reduction algorithm $\calB$ that breaks the PIF security game. To prove this consider the following worlds: 
         \begin{itemize}
             \item \textbf{World-b} : Challenger encrypts message $m_b = (m_{b0}, m_{b1})$ and sends $ct = (ct_0, ct_1)$ to the adversary where $ct_0 = (r_0, Enc(k, m_{b0}, r_0))$ and $ct_1 = (r_1, Enc(k, m_{b1}, r_1))$. Let $p_b$ be the probability that $\calA$ outputs 0 in World-b.
-            \item \textbf{Hybrid-World-b} : Challenger encrypts message  $m_b = (m_{b0}, m_{b1})$ by sampling a random function $f$ from the given input-output space and sends $ct = (ct_0, ct_1)$ to the adversary where $ct_0 = (r_0, m_{b0} \oplus f(r_0)$ and $ct_1 = (r_1, m_{b1} \oplus f(r_1)$. Let $p_{hyb,b}$ be the probability that $\calA$ outputs 0 in Hybrid-World-b.
+            \item \textbf{Hybrid-World-b} : Challenger encrypts message  $m_b = (m_{b0}, m_{b1})$ by sampling a random function $f$ from the given input-output space and sends $ct = (ct_0, ct_1)$ to the adversary where $ct_0 = (r_0, m_{b0} \oplus f(r_0))$ and $ct_1 = (r_1, m_{b1} \oplus f(r_1))$. Let $p_{hyb,b}$ be the probability that $\calA$ outputs 0 in Hybrid-World-b.
         \end{itemize}
 
         Now given that $|p_0 - p_1|$ is non negligible, we can say that either $|p_0 - p_{hyb,0}|$ or $|p_1 - p_{hyb,1}|$ is non-negligible. Note that $p_{hyb,0}$ and $ p_{hyb,1}$ are only negligibly far apart (because of part(a)).
@@ -260,12 +290,11 @@
 
         This will be the case for all but $2^n$ seeds $s$ out of total $2^{2n}$ possible seeds $s$ (where the last n bits of $s$ are $1^n$). So for all these $2^{2n} - 2^n$ seeds, the adversary $\calA$ can guess $b'$ with surety. $\calA$ will incorrectly send $0$ only on the $2^n$ seeds with last n bits $1^n$. Also it may happen that when challenger chooses $b=1$ and samples two uniformly random $6n$ bits, they may have first $3n$ bits same. So the advantage of $\calA$ in the related-key security game is :
 
-        \begin{center}
-            $RKAdv[\calA, \calG'] = Pr[b'=0|b=0] - Pr[b'=0|b=1]$
-        \end{center}
-        where $Pr[b'=0|b=0]$ is $ \frac{2^{2n} - 2^n}{2^{2n}} $ which is same as $\frac{1}{2^n}$.
-        and $Pr[b'=0|b=1]$ is $\frac{1}{2^{3n}}$ which is much lesser. \\
-        So winning probability of $\calA$ is approximately $1+ \frac{1}{2^n}$
+            $$\mathsf{RKAdv}[\calA, \calG'] = \Pr[b'=0|b=0] - \Pr[b'=0|b=1]$$
+        
+            where $\Pr[b'=0|b=0]$ is $ \frac{2^{2n} - 2^n}{2^{2n}} $ which is same as $1-\frac{1}{2^n}$.
+        and $\Pr[b'=0|b=1]$ is $\frac{1}{2^{3n}}$ which is much lesser. \\
+        So winning probability of $\calA$ is approximately $1- \frac{1}{2^{n+1}}$
 
         \item Consider the following worlds, World-0, World-1 and Hybrid-World, in the PRG security game $wrt$ $G'$ and a ppt. adversary $\calA$ : 
         \begin{itemize}
@@ -343,7 +372,7 @@
                   Thus,
                   $$\prg[\calB,\calG]=|p_{i}-p_{i+1}|$$
                   Finally for the combined reduction, we choose any one of the reductions at random.
-                  $$\prg[\calB^c,\calG^c]=\frac{|p_{l}-p_{0}|}{\log n}$$
+                  $$\prg[\calB^c,\calG^c]=\frac{|p_{l}-p_{0}|}{n-1}$$
         \item In the above construction, $\calB$ will need to sample $O(2^d)$ random bitstrings in some hybrids, where $d$ is the depth of the tree. If $d=\log n$ then $\calB$ samples $O(n)$ bitstrings. However, if $d=n$ then he has to sample exponentially many strings, making him inefficient. So, we cannot use the same reduction when $x\in\bit^n$.
         \item The given construction is insecure. Consider an adversary $\calA$ which plays the following game $\calG$:
         \begin{itemize}
@@ -360,7 +389,7 @@
         Thus the $\prf[\calA,\calG]=1-2^{-n}$
         \item The main problem in the above scheme occurs when one of the queries by the adversary is a proper prefix of the other. To avoid this, we modify the scheme by first applying a PRG on the query $x$. Let $\calG' = \{G'_n: \bit^n\rightarrow\bit^{l(n)}\}_{n\in\N}$ be a secure PRG family where $l(n)$ is poly-bounded. In the scheme, the challenger first applies $G'_n$ on the input $x$ sent by the adversary and then uses the tree construction replacing $x\mapsto G'_n(x)$.
         
-        The main intuition behind this construction is that for an \textit{efficient} adversary, it should be difficult to find $x_1,x_2, |x_1|=n_1<n_2=|x_2|$ such that $G'_{n_1}(x_1)$ is a proper prefix of $G'_{n_2}(x_2)$. Then we can use Theorem 4.11 of the book which states that \textit{``If G is a secure PRG, then the variable length tree construction derived from G is a prefix-free secure PRF''}. So, this scheme is plausibly secure.
+        The main intuition behind this construction is that for an \textit{efficient} adversary, it should be difficult to find $x_1,x_2, |x_1|=n_1<n_2=|x_2|$ such that $G'_{n_1}(x_1)$ is a proper prefix of $G'_{n_2}(x_2)$ (for example in the LWE construction). Then we can use Theorem 4.11 of the book which states that \textit{``If G is a secure PRG, then the variable length tree construction derived from G is a prefix-free secure PRF''}. So, this scheme is plausibly secure.
     \end{enumerate}
 \end{solution}
 
