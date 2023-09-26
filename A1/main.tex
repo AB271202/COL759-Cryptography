@@ -151,17 +151,17 @@
         $$\Pr[\text{Adversary wins}]=\frac12+\frac12\mathsf{Adv}[\calA,\calG] \geq\frac{1}{2} + \frac{1}{2^{l_3 + 1}}$$
         Note that in the above derivation, we assumed that $r$ was sampled uniformly at random. Even if it were taken from some other distribution then too that probability will be non-zero.
 
-        \hr
+        % \hr
         
-        \textit{(Aside)}Here is another construction which doesn't take into account the distribution of $r$:
-        \begin{itemize}
-            \item The adversary sends two messages $(m_{00}, m_{01})$ and $(m_1, m_1)$, none of $m_{00},m_{01},m_1$ are equal, and receives ciphertext pair $(ct_0, ct_1)$ from the challenger.
-            \item The adversary decrypts the received ciphertexts with a random key. If he finds that $\dec(k,ct_0)=\dec(k,ct_1)=m_1$, then $\calA$ guesses $b' = 1$ else it sends $b' = 0$.
-        \end{itemize}
-        $$\Pr[b'=1|b=0]\approx0$$
-        On the other hand, when b=1, 
-        $$\Pr[b'=1|b=1]=2^{-l_2}$$
-        Which gives a non-zero advantage.
+        % \textit{(Aside)}Here is another construction which doesn't take into account the distribution of $r$:
+        % \begin{itemize}
+        %     \item The adversary sends two messages $(m_{00}, m_{01})$ and $(m_1, m_1)$, none of $m_{00},m_{01},m_1$ are equal, and receives ciphertext pair $(ct_0, ct_1)$ from the challenger.
+        %     \item The adversary decrypts the received ciphertexts with a random key. If he finds that $\dec(k,ct_0)=\dec(k,ct_1)=m_1$, then $\calA$ guesses $b' = 1$ else it sends $b' = 0$.
+        % \end{itemize}
+        % $$\Pr[b'=1|b=0]\approx0$$
+        % On the other hand, when b=1, 
+        % $$\Pr[b'=1|b=1]=2^{-l_2}$$
+        % Which gives a non-zero advantage.
         % The winning probability of $\calA$ in this scenario would be:
         %  $$\Pr[\text{Adversary wins}]=\frac{1}{2} + \frac{1}{2^{l_3 + 1}}$$. 
          
@@ -387,9 +387,16 @@
         and
         $$\Pr[b'=0|b=1]=\Pr[G(y_1)=(s_0,s_1)\wedge s_1=y_1]=2^{-n}$$
         Thus the $\prf[\calA,\calG]=1-2^{-n}$
-        \item The main problem in the above scheme occurs when one of the queries by the adversary is a proper prefix of the other. To avoid this, we modify the scheme by first applying a PRG on the query $x$. Let $\calG' = \{G'_n: \bit^n\rightarrow\bit^{l(n)}\}_{n\in\N}$ be a secure PRG family where $l(n)$ is poly-bounded. In the scheme, the challenger first applies $G'_n$ on the input $x$ sent by the adversary and then uses the tree construction replacing $x\mapsto G'_n(x)$.
+        % \item The main problem in the above scheme occurs when one of the queries by the adversary is a proper prefix of the other. To avoid this, we modify the scheme by first applying a PRG on the query $x$. Let $\calG' = \{G'_n: \bit^n\rightarrow\bit^{l(n)}\}_{n\in\N}$ be a secure PRG family where $l(n)$ is poly-bounded. In the scheme, the challenger first applies $G'_n$ on the input $x$ sent by the adversary and then uses the tree construction replacing $x\mapsto G'_n(x)$.
         
-        The main intuition behind this construction is that for an \textit{efficient} adversary, it should be difficult to find $x_1,x_2, |x_1|=n_1<n_2=|x_2|$ such that $G'_{n_1}(x_1)$ is a proper prefix of $G'_{n_2}(x_2)$ (for example in the LWE construction). Then we can use Theorem 4.11 of the book which states that \textit{``If G is a secure PRG, then the variable length tree construction derived from G is a prefix-free secure PRF''}. So, this scheme is plausibly secure.
+        % The main intuition behind this construction is that for an \textit{efficient} adversary, it should be difficult to find $x_1,x_2, |x_1|=n_1<n_2=|x_2|$ such that $G'_{n_1}(x_1)$ is a proper prefix of $G'_{n_2}(x_2)$ (for example in the LWE construction). Then we can use Theorem 4.11 of the book which states that \textit{``If G is a secure PRG, then the variable length tree construction derived from G is a prefix-free secure PRF''}. So, this scheme is plausibly secure.
+        \item The main problem in the above scheme occurs when one of the queries by the adversary is a proper prefix of the other. To avoid this, we modify the scheme by using $\calG = \{G_n: \bit^n\rightarrow\bit^{3n}\}_{n\in\N}$. Here, each node of the tree has 3 children. If a bit of $x$ is 0, we take the left most child. If it is 1, we take the central child and if x ends, we take the rightmost child. In this case, even if one of the queries is a prefix of the other, the adversary cannot distinguish if the challenger used the construction or a random bit (\cref{fig:modtree})
+        \begin{figure}[!ht]
+            \centering
+            \includegraphics[scale=0.25]{images/Modified tree.jpg}
+            \caption{The modified tree construction with $\calG = \{G_n: \bit^n\rightarrow\bit^{3n}\}_{n\in\N}$. Here the evaluation for $x_1=01$ and $x_2=010$ are shown. The shaded nodes are the outputs on the queries. As evident from the figure, the shaded nodes aren't directly related with each other. So, the adversary cannot break this scheme.}
+            \label{fig:modtree}
+        \end{figure}
     \end{enumerate}
 \end{solution}
 
