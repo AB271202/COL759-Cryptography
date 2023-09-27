@@ -1,6 +1,8 @@
 """
 You can implement helper function here if you want
 """
+import decrypt
+
 
 def attack(ciphertext, decrypt):
     """
@@ -14,10 +16,14 @@ def attack(ciphertext, decrypt):
 
     TODO: Implement your code below
     """
-
-
+    ct0=ciphertext[:16]
+    decrypted=decrypt(ct0*3)
+    print(decrypted)
+    m0=decrypted[:16]
+    m1=decrypted[16:32]
+    result_byte = bytes([m0[i] ^ m1[i] ^ ct0[i] for i in range(16)])
+    return result_byte
     """
     Return the key in byte format
     Example of key: b'\xb8\x15\xd4\xeeUO\xdf\xa3\x02\xe9\x8d.\xb2\x10\xfa\x0c'
     """
-    return None
