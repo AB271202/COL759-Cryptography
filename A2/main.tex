@@ -192,7 +192,68 @@
 
 \prob{2 : MACs: unique queries vs non-unique queries}
 \begin{solution}
+    \begin{enumerate}[(a)]
+    \item We propose the following MAC scheme $I_{uq} =$ (Sign$_{uq}$, Verify$_{uq}$) that is UFCMA-Unique secure, but not UFCMA secure :
+    $$sign(k, m; r) = (r, F(k_1, r) || F(k_2, m \oplus r))$$ and 
+    $$verify(k, m, \sigma; r) = \begin{cases}
+        1 & \text{if } \sigma = F(k_1, r) || F(k_2, m \oplus r) \\
+        0 & \text{otherwise}
+    \end{cases}$$
+    where $k = (k_1, k_2) \in \{0, 1\}^n$, $m \in \{0, 1\}^n$ and $r \in \{0, 1\}^n$
+
+    \item To prove the UFCMA-Unique security of $I_{uq} =$, we first build the following sequence of hybrid games : \\
+
+    \textit{Game 0:} This is the original security game.
+    \begin{itemize}
+        \item \textbf{Setup Phase :} Challenger chooses a PRF key $k = (k_1, k_2)$.
+        \item \textbf{Query Phase :} Adversary sends polynomially many queries. For the $i^{th}$ query $m_i$, the challenger chooses a random string $r_i \leftarrow \{0, 1\}^n$ and sends $\sigma_i = sign(k, m_i ; r_i)$ to the adversary.
+        \item \textbf{Forgery :} Finally, the adversary outputs $(m^*, \sigma^*)$ such that $(m^*, \sigma^*) \neq (m_i, \sigma_i)$ for all i.
+    \end{itemize}
+    let the winning probability of Adversary $\calA$ in game 0 be $p_0$. \\
+
+    \textit{Game 1:} In this game, Challenger replaces one of the PRFs with a random function.
+    \begin{itemize}
+        \item \textbf{Setup Phase :} Challenger chooses a PRF key $k = (k_1, k_2)$ and samples $f \leftarrow Func[\calX, \calY]$. (here $\calY = \{0, 1\}^n$ and $\calX = \{0, 1\}^n$)
+        \item \textbf{Query Phase :} Adversary sends polynomially many queries. For the $i^{th}$ query $m_i$, the challenger chooses a random string $r_i \leftarrow \{0, 1\}^n$ and sends $\sigma_i = f(r_i) || F(k_2, m \oplus r_i)$ to the adversary.
+        \item \textbf{Forgery :} Finally, the adversary outputs $(m^*, \sigma^*)$ such that $(m^*, \sigma^*) \neq (m_i, \sigma_i)$ for all i.
+    \end{itemize}
+    let the winning probability of Adversary $\calA$ in game 1 be $p_1$. \\
+
+    \textit{Game 2:} In this game, Challenger replaces both the PRFs with random functions.
+    \begin{itemize}
+        \item \textbf{Setup Phase :} Challenger samples $f_1 \leftarrow Func[\calX, \calY]$ and $f_2 \leftarrow Func[\calX, \calY]$.
+        \item \textbf{Query Phase :} Adversary sends polynomially many queries. For the $i^{th}$ query $m_i$, the challenger chooses a random string $r_i \leftarrow \{0, 1\}^n$ and sends $\sigma_i = f(r_i) || f(m \oplus r_i)$ to the adversary.
+        \item \textbf{Forgery :} Finally, the adversary outputs $(m^*, \sigma^*)$ such that $(m^*, \sigma^*) \neq (m_i, \sigma_i)$ for all i.
+    \end{itemize}
+    let the winning probability of Adversary $\calA$ in game 2 be $p_2$. \\
     
+    \textit{Claim 1 :} $|p_0 - p_1|$ is negligible.\\
+    \textbf{Proof:} We will show a reduction algorithm $\calB$ which uses $\calA$ and has PRFAdv = $|p_0 - p_1|$.\\
+    The reduction algorithm receives signing queries ($m_i$) from $\calA$. It samples $r_i$ and a key $k$ and forwards it to the PRF challenger. It the receives $f(r_i)$ from the PRF challenger and calculates $\sigma_i = f(r_i) || F(k, m \oplus r_i)$. It sends the signature $\sigma_i$ to the adversary. The adversary then guesses a bit b, where b = 0 for Game 0 and b = 1 for Game 1. The reduction $\calB$ then forwards the bit b to the PRF challenger.\\
+    If the PRF challenger chooses pseudorandom, this corresponds to Game 0 for the adversary $\calA$ and it outputs 0 with a probability $p_0$. On the other hand, if PRF challenger chooses completely random, then it corresponds to Game 1 for the adversary and it outputs 1 with probability $p_1$. So $$PRFAdv[B, F] = |p_0 - p_1|$$.
+    Hence, $|p_0 - p_1|$ is negligible as it is given that F is a secure PRF.\\
+
+    \textit{Claim 2:} $|p_1 - p_2|$ is negligible.\\
+    \textbf{Proof:} We will show a reduction algorithm $\calB$ which uses $\calA$ and has PRFAdv = $|p_1 - p_2|$.\\
+    The reduction algorithm receives signing queries ($m_i$) from $\calA$. It samples $r_i$ and a random function $f' \leftarrow Func[\calX, \calY]$. It then forwards $m_i \oplus r_i$ to the PRF challenger. It then receives $f(r_i \oplus m_i)$ from the PRF challenger and calculates $\sigma_i = f'(r_i) || f(m \oplus r_i)$. It sends the signature $\sigma_i$ to the adversary. The adversary then guesses a bit b, where b = 0 for Game 1 and b = 1 for Game 2. The reduction $\calB$ then forwards the bit b to the PRF challenger.\\
+    If the PRF challenger chooses pseudorandom, this corresponds to Game 1 for the adversary $\calA$ and it outputs 0 with a probability $p_1$. On the other hand, if PRF challenger chooses completely random, then it corresponds to Game 2 for the adversary and it outputs 1 with probability $p_2$. So $$PRFAdv[B, F] = |p_1 - p_2|$$.
+    Hence, $|p_1 - p_2|$ is negligible as it is given that F is a secure PRF.\\
+
+    \textit{Claim 3:} For any Adversary $\calA$, $p_2 = \frac{1}{|\calY|^2}$. (note that, $|\calY| = 2^n$).\\
+    \textbf{Proof :} As, $f_1$ and $f_2$ are completely random functions, $f(x)$ for any x is equivalent to choosing a random output $y \in \calY$.\\
+    In order to win the game, the output by the adversary $(m^*, \sigma^*)$ must satisfy $\sigma^*_1 = f_1(r)$ and $\sigma^*_2 = f_2(m_i \oplus r)$ ($\sigma^*_1$ and $\sigma^*_2$ are the first n and the last n bits of $\sigma^*$ respectively). Since $f_1$ and $f_2$ are completely random, the probability of this happening would be $\frac{1}{|\calY|^2}$.\\
+
+    Thus, by all the above claims, we can prove that $I_{uq}$ is a UFCMA-Unique MAC scheme.
+
+    \item We will show this using a counter example:\\
+    \begin{itemize}
+        \item The adversary queries for m twice and receives $\sigma_1 = F(k_1, r) || F(k_2, m \oplus r)$ adn $\sigma_2 = F(k_1, r') || F(k_2, m \oplus r')$.
+        \item It then sends $(m \oplus r \oplus r', (r', \sigma_{21} || \sigma_{12}))$. (where $\sigma_{21}$ are the first n bits of $\sigma_{2}$ and similarly $\sigma_{12}$ are the last n bits of $\sigma_{1}$.)
+    \end{itemize}
+
+    Since $(m \oplus r \oplus r') \oplus r' = (m \oplus r)$, the above forgery is valid. The only case where this forgery would not work is when both $r$ and $r'$ are same. This happens with a very small probability of $\frac{1}{2^{2n}}$ and hence is negligible. So the adversary wins with a \textbf{probability of almost 1}. \\
+    Also the adversary can continue sending m as signing queries until it receives two such signatures with distinct randomness. Then the adversary will win with probability exactly equal to 1.
+ \end{enumerate}
 \end{solution}
 
 
@@ -229,7 +290,22 @@
 
 \prob{5 : 3-round Luby-Rackoff with inversion queries}
 \begin{solution}
-   
+   To launch an attack against the 3-round Luby-Rackoff permutation, we will need 3 oracle queries.
+   \begin{itemize}
+       \item permute(x, y)
+       \item permute(x, z)
+       \item inverse\_permute($\alpha$, $\beta$)
+   \end{itemize}
+   where x, y and z are some 16 bytes array and $y \neq z$. Let permute(x, y) = $(\gamma_1, \delta_1)$ and permute(x, z) = $(\gamma_2, \delta_2)$. \\
+   We will choose $\alpha = \gamma_2$ and $\beta = \delta_2 \oplus y \oplus z$. Let inverse\_permute($\alpha$, $\beta$) = ($m$, $n$).//
+
+   If $ m = x \oplus \gamma_1 \oplus \gamma_2$ then the adversary outputs 0 (indicating PRP) else the adversary attack outputs 1 (indicating Completely random).\\
+
+   This attack works because for 3-round Luby-Rackoff $$PRP(x, y) = (x \oplus F(k_2, y \oplus F(k_1, x)), y \oplus F(k_1, x) \oplus F(k_3, x \oplus F(k_2, y \oplus F(k_1, x))$$
+   and 
+   $$PRP^{-1}(u, v) = (u \oplus F(k_2, v \oplus F(k_3, u), ... )$$
+
+   on substituting $(u, v) = (\alpha, \beta)$ we get $m = x \oplus F(k_2, y \oplus F(k_1, x)) \oplus F(k_2, z \oplus F(k_1, x))$ which is same as $x \oplus \gamma_1 \oplus \gamma_2$.
 \end{solution}
 
 
