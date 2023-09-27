@@ -246,7 +246,14 @@
 \end{solution}
 
 
-\prob{Part B : Coding Problem}
+\prob{Part B : Coding Problem-Padding Oracle Attack}
+The concept here is similar to the padding oracle attack discussed in class. First, we find the padding of the message corresponding to the given ciphertext. For this, we begin from the end of the first 16 byte block of the ciphertext (after the initialization vector) and manipulate each byte till we get a padding error. For instance, in the example given in the problem statement:
+$$m' = (10, 10, 10, 10, 10, 10, 10, 10, 10, \mathbf{10}, 11, 42, 33, 01, 89, 12)$$
+If the highlighted byte is altered, then it will result in a padding error. But if the bytes after the highlighted one are altered, there will be no padding error.
 
-
+Let the number of padding bytes be $p$. Now, to decipher the $(p+1)^\text{th}$ byte, we increase the padding bits by 1. This will result in a padding error. So, we check for which $k$ 
+$$m'_{p+1}\oplus k = p+1$$
+When this happens, the padding error will stop since the first $p+1$ bytes have the value $p+1$. The message byte can be recovered simply as
+$$m'_{p+1} = p+1\oplus k$$
+This process is continued till we get the entire message.
 \end{document}
