@@ -14,17 +14,18 @@ def check_padding(encd):
     decd = aes.decrypt(encd[16:])
 
     padding_bits = decd[0]
-
+    # print(padding_bits)
+    # print(list(decd[0:6]))
     if padding_bits > 16 or padding_bits < 1 or len(decd) < padding_bits:
-        print('Invalid Padding')
+        # print('Invalid Padding')
         return 2
     
     padding = decd[:padding_bits]
     if all([byte == padding_bits for byte in padding]):
-        print('Valid Padding')
+        # print('Valid Padding')
         return 0
     else:
-        print('Invalid Padding')
+        # print('Invalid Padding')
         return 2
 
 
