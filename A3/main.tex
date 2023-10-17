@@ -1,0 +1,178 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage{comment} 
+\usepackage{lipsum} %This package just generates Lorem Ipsum filler text. 
+\usepackage{fullpage} % changes the margin
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\usepackage[fleqn]{amsmath}
+\usepackage{amssymb,amsthm}  % assumes amsmath package installed
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usepackage{verbatim}
+\usepackage[numbered]{mcode}
+\usepackage{float}
+\usepackage{tikz}
+    \usetikzlibrary{shapes,arrows}
+    \usetikzlibrary{arrows,calc,positioning}
+
+    \tikzset{
+        block/.style = {draw, rectangle,
+            minimum height=1cm,
+            minimum width=1.5cm},
+        input/.style = {coordinate,node distance=1cm},
+        output/.style = {coordinate,node distance=4cm},
+        arrow/.style={draw, -latex,node distance=2cm},
+        pinstyle/.style = {pin edge={latex-, black,node distance=2cm}},
+        sum/.style = {draw, circle, node distance=1cm},
+    }
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage[shortlabels]{enumitem}
+\usepackage{indentfirst}
+\usepackage{hyperref}
+\usepackage[capitalize, nameinlink]{cleveref}
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+
+\newenvironment{problem}[2][Problem]
+    { \begin{mdframed}[backgroundcolor=gray!20] \textbf{#1 #2} \\}
+    {  \end{mdframed}}
+
+\newenvironment{reduction}
+    { \begin{mdframed}[backgroundcolor=blue!20] \\}
+    {  \end{mdframed}}
+% Define solution environment
+
+\newcommand{\hr}{\noindent\rule{7in}{2.8pt}}
+\newenvironment{solution}
+    {\textit{Solution:}}
+    {\clearpage}
+\newcommand{\prob}[1]{\begin{mdframed}[backgroundcolor=gray!20] \textbf{Problem #1}\end{mdframed}}
+\renewcommand{\qed}{\quad\qedsymbol}
+\newcommand{\bit}{\left\{0, 1\right\}}
+\newcommand{\enc}{\mathsf{Enc}}
+\newcommand{\dec}{\mathsf{Dec}}
+\newcommand{\negl}{\mathsf{negl}}
+\newcommand{\prf}{\mathsf{PRFAdv}}
+\newcommand{\prg}{\mathsf{PRGAdv}}
+\newcommand{\poly}{\mathsf{poly}}
+\newcommand{\ord}{\mathsf{ord}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\calE}{\mathcal{E}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calG}{\mathcal{G}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calK}{\mathcal{K}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calS}{\mathcal{S}}
+\newcommand{\calX}{\mathcal{X}}
+\newcommand{\calY}{\mathcal{Y}}
+
+\newcommand{\inparen}[1]{\left{ #1 \right}}
+\newcommand{\probtwo}[2]{\mathsf{Pr}_{#1}\left[ #2 \right]}
+\newcommand{\set}[1]{\left\{ #1 \right\}}
+\newcommand{\ct}{\mathsf{ct}}
+\newcommand{\twotimessadv}[1]{\mathsf{2SSAdv}\left[ #1 \right]}
+
+
+
+\newlength{\protowidth}
+\newcommand{\pprotocol}[5]{
+{\begin{figure*}[#3]
+\begin{center}
+\setlength{\protowidth}{\textwidth}
+\addtolength{\protowidth}{-3\intextsep}
+
+\fbox{
+        \small
+        \hbox{\quad
+        \begin{minipage}{\protowidth}
+    \begin{center}
+    {\bf #1}
+    \end{center}
+        #5
+        \end{minipage}
+        \quad}
+
+        }
+        
+\end{center}
+\vspace{-4ex}
+\caption{{#4} #2}
+\end{figure*}
+} }
+
+% the first arg is name of security game
+% the second arg is caption
+% the third arg is the game description
+% the label needs to be included 
+\newcommand{\securitygame}[4]{
+   \pprotocol{#1}{#2}{ht!}{#3}{#4}
+}
+
+\newcommand{\constr}[4]{
+   \pprotocol{#1}{#2}{tbh!}{#3}{#4}
+}
+
+\begin{document}
+
+\noindent
+\large\textbf{Anish Banerjee, Shankh Gupta} \hfill \textbf{Problem Set - 1}   \\
+\normalsize COL759: Cryptography \hfill August 2023\\
+\hr
+
+
+\prob{1: CPA with Very Weak Ciphertext Integrity}
+\begin{solution}
+
+\end{solution}
+
+
+\prob{2 : Encryption Scheme with Threshold Decryption}
+\begin{solution}
+   
+\end{solution}
+
+\prob{3 : One-time secure MACs, and Upgrading One-Time MACs to
+Many-Time MACs}
+\begin{solution}
+    
+\end{solution}
+
+
+\prob{4 : CCA Security v/s Authenticated Encryption}
+\begin{solution}
+    
+\end{solution}
+
+\prob{5: Modular Arithmetic and Basic Group Theory}
+\begin{solution}
+    \begin{enumerate}[(a)]
+        \item Since $a$ and $p$ are coprime, by the Extended Euclid's Agorithm:
+        $$ ab+py=\gcd(a,p)=1    $$
+        Taking modulo p on both sides:
+        $$ ab \mod p =1    $$
+        Where $b\in\Z_p$ (If not then by the division algorithm $b=qp+b', b'<p$. So, we can replace $b$ with $b'$)
+        \vspace{20pt}
+
+        Now suppose there exist $b, b'\in\Z_p$ such that 
+        $$ ab=1\mod p \hspace{50pt} ab'=1\mod p    $$
+        Then by definition of mod, $p|a(b-b')$. So $b-b'=0$ since $a$ and $b-b'$ will be coprime to $p$. Hence $b$ is unique.
+
+        \item Consider $h(y)=y^2+y$ and $n=6$. For 3 values of $y$ viz. $2,3,5$, we have $h(y)=0\mod 6$. Thus 
+        $$|\{y\in\Z_6:y^2+y=0\mod6\}|=3>2$$
+
+        \item Let $a\in\Z_p$ and $r=\ord(a)$. Then $a^r=1\mod p$. By Fermat's Little Theorem:
+        $$a^{p-1}=1\mod p$$
+        Suppose by the division algorithm, $p-1=rq+s$, $s<r$. Since $a^{p-1}=1\mod p$ and $a^{r}=1\mod p$, $$a^{p-1-rq}=1\mod p$$ and hence $a^{s}=1\mod p$. But since $s<r$, it must be 0.
+    \end{enumerate}
+\end{solution}
+
+\end{document}
