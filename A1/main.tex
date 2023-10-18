@@ -151,30 +151,6 @@
         $$\Pr[\text{Adversary wins}]=\frac12+\frac12\mathsf{Adv}[\calA,\calG] \geq\frac{1}{2} + \frac{1}{2^{l_3 + 1}}$$
         Note that in the above derivation, we assumed that $r$ was sampled uniformly at random. Even if it were taken from some other distribution then too that probability will be non-zero.
 
-        % \hr
-        
-        % \textit{(Aside)}Here is another construction which doesn't take into account the distribution of $r$:
-        % \begin{itemize}
-        %     \item The adversary sends two messages $(m_{00}, m_{01})$ and $(m_1, m_1)$, none of $m_{00},m_{01},m_1$ are equal, and receives ciphertext pair $(ct_0, ct_1)$ from the challenger.
-        %     \item The adversary decrypts the received ciphertexts with a random key. If he finds that $\dec(k,ct_0)=\dec(k,ct_1)=m_1$, then $\calA$ guesses $b' = 1$ else it sends $b' = 0$.
-        % \end{itemize}
-        % $$\Pr[b'=1|b=0]\approx0$$
-        % On the other hand, when b=1, 
-        % $$\Pr[b'=1|b=1]=2^{-l_2}$$
-        % Which gives a non-zero advantage.
-        % The winning probability of $\calA$ in this scenario would be:
-        %  $$\Pr[\text{Adversary wins}]=\frac{1}{2} + \frac{1}{2^{l_3 + 1}}$$. 
-         
-        %  NOTE: Two distinct messages can't have same ciphers with same random strings and two same messages with different random strings will not have the same cipher text. So,
-        %   $$\mathsf{Adv}[\calA] =  \Big| \Pr[b'=1|b=0] - \Pr[b'=1|b=1] \Big| $$ 
-        %   where 
-        %   $$Pr[b'=1|b=0] = \frac{1}{2^{l_3}}$$ 
-        %   and 
-        %   $$Pr[b'=1|b=1] = 0$$
-        
-        % Even if the encryption scheme is such that it samples only distinct random strings for encryption, still there is non-zero probability of two different messages having the same cipher-texts. Note that two different messages can't have the same ciphers as this would lead to ambiguity in decryption. So in this case the adversary remains the same with only difference that it outputs 1 if $ct_0 = ct_1$ irrespective of random strings. In this case $Pr[b'=1|b=0] = 0$ (because two same messages with different random strings will not have the same cipher text.) and $Pr[b'=1|b=1] = \frac{1}{2^{l_3}}$. So 
-        % $$\mathsf{Adv}[\calA] =  \Big| Pr[b'=1|b=0] - Pr[b'=1|b=1] \Big| = \frac{1}{2} + \frac{1}{2^{l_3 + 1}}$$
-
         \item The encryption scheme $\calE = (\enc, \dec)$ which satisfies $ O(2^{-l}) $-perfect-two-time Security can be constructed as follows:
             $$\enc(k, m, r) = (r, m \oplus h_k(r))$$ and
             $$\dec(k, (ct_0, ct_1)) = ct_1 \oplus h_k(ct_0) $$
