@@ -65,6 +65,7 @@
 \newcommand{\prg}{\mathsf{PRGAdv}}
 \newcommand{\poly}{\mathsf{poly}}
 \newcommand{\ord}{\mathsf{ord}}
+\newcommand{\ddh}{\mathsf{DDH}}
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Z}{\mathbb{Z}}
@@ -72,10 +73,13 @@
 \newcommand{\calA}{\mathcal{A}}
 \newcommand{\calB}{\mathcal{B}}
 \newcommand{\calC}{\mathcal{C}}
+\newcommand{\calD}{\mathcal{D}}
 \newcommand{\calE}{\mathcal{E}}
 \newcommand{\calF}{\mathcal{F}}
 \newcommand{\calG}{\mathcal{G}}
 \newcommand{\calH}{\mathcal{H}}
+\newcommand{\calI}{\mathcal{I}}
+\newcommand{\calJ}{\mathcal{J}}
 \newcommand{\calK}{\mathcal{K}}
 \newcommand{\calM}{\mathcal{M}}
 \newcommand{\calS}{\mathcal{S}}
@@ -180,9 +184,9 @@
             \dec(k_3,\dec(k_2,\ct)) \hspace{50pt} k_i=2,k_j=3 \\
             \dec(k_4,\dec(k_3,\ct)) \hspace{50pt} k_i=3,k_j=4
         \end{cases}$$
-    
+
     \noindent\textbf{Correctness:} Correctness of the scheme can be checked easily
-    
+
     \securitygame{Security Game}{Security Game for Problem 2}{\label{red:p2sg}}
     {
         \begin{itemize}
@@ -239,13 +243,13 @@
             \item $\calA$ sends $k_1, k_4$, as well as challenge messages $(m^0_{1,2}, m^0_{2,3},m^0_{3,4})$ and $(m^1_{1,2}, m^1_{2,3},m^1_{3,4})$ to $\calB$
             \item $\calB$ computes $x_0\gets\enc(k_1,m_{1,2}^0), x_1\gets\enc(k_1,m_{1,2}^1)$ and sends them to the challenger $\calC$ for $\calE$ to obtain $\ct = \enc(k_2,\enc(k_1,m^b_{1,2}))$. $\calB$ sets $\ct_{1,2}=\ct$
             \item $\calB$ samples $k_3\gets\calK$ and computes $x_3\gets\enc(k_3,m^0_{2,3})$. He then sends $(x_3,x_3)$ to $\calC$ to obtain $\ct'= \enc(k_2,\enc(k_3,m^0_{2,3}))$ and sets $\ct_{2,3}=\ct'$
-            \item Next, $\calB$ computes $\ct_{3,4}\gets\enc(k_3,\enc(k_4,m^0_{3,4}))$ 
+            \item Next, $\calB$ computes $\ct_{3,4}\gets\enc(k_3,\enc(k_4,m^0_{3,4}))$
             \item $\calB$ sends $(\ct_{1,2}, \ct_{2,3}, \ct_{3,4})$ to $\calA$
             \item For the encryption queries, $\calB$ follows a similar procedure as above.
             \item Finally $\calA$ outputs a bit $b'$ which $\calB$ forwards to $\calC$
         \end{itemize}
     }
-    
+
     If $\calC$ chooses $b$ to be 0 then the above reduction corresponds to World 0  while if he chooses 1, then it corresponds to Hybrid World 0. So the CPA advantage of $\calB=|p_0-p_{\hyb,0}|$
     \begin{figure}[!ht]
         \centering
@@ -265,7 +269,7 @@
     {
         \begin{itemize}
             \item $\calA$ sends $k_1, k_4$, as well as challenge messages $(m^0_{1,2}, m^0_{2,3},m^0_{3,4})$ and $(m^1_{1,2}, m^1_{2,3},m^1_{3,4})$ to $\calB$
-            \item $\calB$ samples $k_2\gets\calK$ and computes $\ct_{1,2}\gets\enc(k_2,\enc(k_1,m^1_{1,2}))$. 
+            \item $\calB$ samples $k_2\gets\calK$ and computes $\ct_{1,2}\gets\enc(k_2,\enc(k_1,m^1_{1,2}))$.
             \item $\calB$ sends $m^0_{2,3}, m^1_{2,3}$ to $\calC$ to obtain $\ct=\enc(k_3,m_{2,3}^b)$ and sets $\ct_{2,3}\gets\enc(k_2,\ct)$
             \item $\calB$ computes $x_0\gets\enc(k_4,m_{3,4}^0)$ and sends $(x_0,x_0)$ to $\calC$ to obtain $\ct' = \enc(k_3,\enc(k_4,m^0_{3,4}))$. $\calB$ sets $\ct_{3,4}=\ct'$
             \item $\calB$ sends $(\ct_{1,2}, \ct_{2,3}, \ct_{3,4})$ to $\calA$
@@ -273,7 +277,7 @@
             \item Finally $\calA$ outputs a bit $b'$ which $\calB$ forwards to $\calC$
         \end{itemize}
     }
-    
+
     If $\calC$ chooses $b$ to be 0 then the above reduction corresponds to Hybrid World 0  while if he chooses 1, then it corresponds to Hybrid World 1. So the CPA advantage of $\calB=|p_{\hyb,0}-p_{\hyb,1}|$
     \begin{figure}[!ht]
         \centering
@@ -292,7 +296,7 @@
     {
         \begin{itemize}
             \item $\calA$ sends $k_1, k_4$, as well as challenge messages $(m^0_{1,2}, m^0_{2,3},m^0_{3,4})$ and $(m^1_{1,2}, m^1_{2,3},m^1_{3,4})$ to $\calB$
-            \item $\calB$ samples $k_2\gets\calK$ and computes $\ct_{1,2}\gets\enc(k_2,\enc(k_1,m^1_{1,2}))$. 
+            \item $\calB$ samples $k_2\gets\calK$ and computes $\ct_{1,2}\gets\enc(k_2,\enc(k_1,m^1_{1,2}))$.
             \item $\calB$ sends $m^1_{2,3}, m^1_{2,3}$ to $\calC$ to obtain $\ct=\enc(k_3,m_{2,3}^1)$ and sets $\ct_{2,3}\gets\enc(k_2,\ct)$
             \item $\calB$ computes $x_0\gets\enc(k_4,m_{3,4}^0), x_1\gets\enc(k_4,m_{3,4}^1)$ and sends $(x_0,x_1)$ to $\calC$ to obtain $\ct' = \enc(k_3,\enc(k_4,m^b_{3,4}))$. $\calB$ sets $\ct_{3,4}=\ct'$
             \item $\calB$ sends $(\ct_{1,2}, \ct_{2,3}, \ct_{3,4})$ to $\calA$
@@ -302,7 +306,7 @@
     }
 
     If $\calC$ chooses $b$ to be 0 then the above reduction corresponds to Hybrid World 1  while if he chooses 1, then it corresponds to World 1. So the CPA advantage of $\calB=|p_{\hyb,1}-p_{1}|$
-    
+
     \begin{figure}[!ht]
         \centering
         \includegraphics[scale=0.25]{images/Reduction23.jpg}
@@ -313,8 +317,7 @@
     Thus from the above three claims, we can conclude that if $(\enc,\dec)$ is CPA secure, then no p.p.t. adversary has non-negligible advantage in the security game defined above.
 \end{solution}
 
-\prob{3 : One-time secure MACs, and Upgrading One-Time MACs to
-    Many-Time MACs}
+\prob{3 : One-time secure MACs, and Upgrading One-Time MACs to Many-Time MACs}
 \begin{solution}
 
 \end{solution}
@@ -342,9 +345,40 @@
         \item Consider $h(y)=y^2+y$ and $n=6$. For 3 values of $y$ viz. $2,3,5$, we have $h(y)=0\mod 6$. Thus
               $$|\{y\in\Z_6:y^2+y=0\mod6\}|=3>2$$
 
-        \item Let $a\in\Z_p$ and $r=\ord(a)$. Then $a^r=1\mod p$. By Fermat's Little Theorem:
+        \item For this part, we will use Fermat's Little Theorem.
+        \begin{theorem}[Fermat's Little Theorem]
+            For any prime number $p$ and $a\in\Z$
+            $$a^{p-1}=1\mod p$$
+        \end{theorem}
+            \begin{proof}
+                We use the following observation:
+                
+                \textbf{Observation:} Let $a \in\Z^*_p$. Consider the set $S_a = \{a\cdot i: i\in\Z^*_p\}$. Then $S_a = \Z^*_p$. 
+                
+                Otherwise, suppose there exist $i,j\in\Z^*_p$ such that $$a\cdot i \mod p= a\cdot j\mod p\implies p | a (i-j)\implies i=j$$
+
+                Now consider the product of all elements of $S_a$
+
+                $$\prod_{a_i\in S_a}a_i=\prod_{i=1}^{p-1}a\cdot i=a^{p-1}\prod_{i\in\Z^*_p}i$$
+                Since $S_a = \Z^*_p$, the products on both sides must be the same. Hence $$a^{p-1}=1\mod p$$
+
+
+            \end{proof}
+        Let $a\in\Z_p$ and $r=\ord(a)$. Then $a^r=1\mod p$. By Fermat's Little Theorem:
               $$a^{p-1}=1\mod p$$
               Suppose by the division algorithm, $p-1=rq+s$, $s<r$. Since $a^{p-1}=1\mod p$ and $a^{r}=1\mod p$, $$a^{p-1-rq}=1\mod p$$ and hence $a^{s}=1\mod p$. But since $s<r$, $s$ must be 0.
+
+        \item Observe that the given distribution $\calD_0$ is a modification of the $\ddh$ distibution $$\calD'_0=\{(g, g^a, g^b, g^{a\cdot b}) : g\gets G, a,b\gets\Z^*_p \}$$ where $b=a^2$. So, an Adversary which can distinguish between $\calD'_0$ and $\calD_1$ should also be able to distinguish between $\calD_0$ and $\calD_1$.
+        
+        The reduction $\calB$ simply forwards the message it receives from the challenger to $\calA$ and forwards the output of $\calA$ to $\calC$ as showin in \cref{fig:p5d}
+        \begin{figure}[!ht]
+            \centering
+            \includegraphics[scale=0.25]{images/Reduction5d.jpg}
+            \caption{Reduction for Problem 5d}
+            \label{fig:p5d}
+        \end{figure}
+  
+        \item TODO
     \end{enumerate}
 \end{solution}
 
