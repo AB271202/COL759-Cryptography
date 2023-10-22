@@ -150,11 +150,6 @@
 
 \begin{document}
 
-\newtheorem*{claim}[theorem]{Claim}
-\newenvironment{fclaim}
-{\colorlet{shadecolor}{red!20}\begin{shaded}\begin{claim}}
-            {\end{claim}\end{shaded}}
-
 \noindent
 \large\textbf{Anish Banerjee, Shankh Gupta} \hfill \textbf{Problem Set - 3}   \\
 \normalsize COL759: Cryptography \hfill October 2023\\
@@ -388,11 +383,15 @@
               \begin{world}[Hybrid World $\mathbf{i}$:]
                   The Challenger samples from the distribution $$\calD'_i=\{(g,g^\mathbf{M}): g\gets G,\mathbf{M}\gets S_i \}$$
               \end{world}
-              Observe that Hybrid World 1 corresponds to sampling from $\calD_1$ and Hybrid World $n$ corresponds to sampling from  $\calD_1$ specified in the question.
+              Observe that Hybrid World 1 corresponds to sampling from $\calD_1$ and Hybrid World $n$ corresponds to sampling from  $\calD_0$ specified in the question.
               Let $p_i$ be the probability of the Adversary outputting 0 in the above Hybrids.
 
               \textbf{Claim:} If there exists an adversary $\calA$ such that $|p_i-p_{i+1}|$ is non-negligible then there exists an adversary $\calB$ which solves the DDH problem for group $G$.
+              
+              
               Consider the following reduction:
+
+
               \securitygame{Reduction}{Reduction for Problem 5e}{\label{red:p5e}}
               {
                   \begin{itemize}
@@ -418,7 +417,15 @@
                       \item $\calA$ responds with a bit $b'$ which $\calB$ forwards to $\calC$
                   \end{itemize}
               }
-              Observe that if $b=0$ then it corresponds to Hybrid World $i$ and if $b=1$ then it corresponds to Hybrid World $i+1$. This is because the matrix
+
+              \begin{figure}[!ht]
+                \centering
+                \includegraphics[scale=0.25]{images/Reduction5e.jpg}
+                \caption{Reduction for Problem 5e}
+                \label{fig:p5e}
+            \end{figure}
+
+              Observe that if $b=0$ then it corresponds to Hybrid World $i+1$ and if $b=1$ then it corresponds to Hybrid World $i$. This is because the matrix
               $$
                   \begin{bmatrix}
                       {v_{1,1}}        & {v_{1,2}}          & \dots  & {v_{1,t}}              \\
@@ -444,9 +451,9 @@
               $$
               Has the last $i$ rows as the multiple of the tuple $(\beta, \beta_1, \beta_2\dots\beta_{t-1})$. Hence, $$\mathsf{DDHAdv}[\calB, \calC]=|p_i-p_{i+1}|$$
             
-            
-            Hence we observe that the hybrid worlds are computationally indistinguishable. Assuming that the DDH problem is hard on $G$,
-            $$|p_1-p_{n}|\leq \sum_i=1^{n-1}|p_i-p_{i+1}|$$
+            \vspace{20pt}
+            Therefore we observe that the hybrid worlds are computationally indistinguishable. Assuming that the DDH problem is hard on $G$,
+            $$|p_1-p_{n}|\leq \sum_{i=1}^{n-1}|p_i-p_{i+1}|$$
             Which is negligible assuming $|p_i-p_{i+1}|$ is negligible. So, $\calD_0$ and $\calD_1$ are computationally indistinguishable.
 
 
