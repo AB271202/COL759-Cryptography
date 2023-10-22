@@ -64,11 +64,14 @@
 \newcommand{\prf}{\mathsf{PRFAdv}}
 \newcommand{\prg}{\mathsf{PRGAdv}}
 \newcommand{\poly}{\mathsf{poly}}
+\newcommand{\sign}{\mathsf{Sign}}
+\newcommand{\verif}{\mathsf{Verify}}
 \newcommand{\ord}{\mathsf{ord}}
 \newcommand{\ddh}{\mathsf{DDH}}
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Z}{\mathbb{Z}}
+\newcommand{\T}{\mathbb{T}}
 
 \newcommand{\calA}{\mathcal{A}}
 \newcommand{\calB}{\mathcal{B}}
@@ -85,6 +88,8 @@
 \newcommand{\calS}{\mathcal{S}}
 \newcommand{\calX}{\mathcal{X}}
 \newcommand{\calY}{\mathcal{Y}}
+\newcommand{\calR}{\mathcal{R}}
+\newcommand{\calT}{\mathcal{T}}
 
 \newcommand{\inparen}[1]{\left{ #1 \right}}
 \newcommand{\probtwo}[2]{\mathsf{Pr}_{#1}\left[ #2 \right]}
@@ -158,7 +163,71 @@
 
 \prob{1: CPA with Very Weak Ciphertext Integrity}
 \begin{solution}
-
+    We define our encryption scheme $\calE = (\mathsf{Enc, Dec})$  as follows : 
+    $$\mathsf{Enc}(k, m; r) = (r, F(k, r) \oplus m, F(k, m))$$ and
+    $$\mathsf{Dec}(k, ct) = F(k, ct_0) \oplus ct_1$$ where $ct = (ct_0, ct_1, ct_2)$. \\
+    Here, the key space $\calK = \bit^n$ and message space $\calM = \bit^n$, the random space $\calR = \bit^n$ and the ciphertext space is $\calC = \bit^{3n}$. \\ \\
+    To prove the CPA security of $\calE$, we will create the following Hybrid-World Structure : \\ \\
+    \textbf{World-b :} 
+        \begin{itemize}
+            \item The challenger $\calC$ samples a key $k$ and a random string $r$.
+            \item The Adversary $\calA$ sends polynomially many queries to the challenger. For each query $(m_{i0}, m_{i1})$, the challenger responds by sending $\enc(k, m_{ib})$ to $\calA$.
+            \item Finally $\calA$ sends a bit $b'$ as its output to the challenger.
+        \end{itemize}
+    Let $Pr[b' = 0] = p_b$. \\ \\
+    % \textbf{Hybrid-World-b :} 
+    %     \begin{itemize}
+    %         \item The challenger $\calC$ samples a key $k$ and a random string $r$. It also maintains a table $\calT$ which is initially empty.
+    %         \item The Adversary $\calA$ sends polynomially many queries to the challenger. For each query $(m_{i0}, m_{i1})$, the challenger responds by sending $(r_i, y_i \oplus m, F(k, m))$ to $\calA$, where $y_i \leftarrow \bit^n$ is sampled uniformly randomly on-the-fly by the challenger, and the tuple $(r_i, y_i)$ is stored in $\calT$. If $(r_i, .)$ is already present in $\calT$, then the challenger outputs the corresponding value of $r_i$ as $y_i$.
+    %         \item Finally $\calA$ sends a bit $b'$ as its output to the challenger.
+    %     \end{itemize}
+    \textbf{Hybrid-World-b:} 
+        \begin{itemize}
+            \item The challenger $\calC$ samples a key $k$ and a random string $r$. It also samples a uniformly random function $f \leftarrow Func[\calX, \calY]$ (where $\calX, \calY = \bit^n$).
+            \item The Adversary $\calA$ sends polynomially many queries to the challenger. For each query $(m_{i0}, m_{i1})$, the challenger responds by sending $(r_i, f(r_i) \oplus m_{ib}, f(m_i))$ to $\calA$.
+            \item Finally $\calA$ sends a bit $b'$ as its output to the challenger.
+        \end{itemize}
+    Let $Pr[b' = 0] = p_{hyb-b}$. \\ \\
+    \textbf{Claim 1:} $p_{hyb-0} = p_{hyb-1}$ \\
+    \textit{Proof:} This follows from the fact that in the Hybrid-World-0 and Hybrid-World-1, $f(.)$ is sampled uniformly randomly and therefore using the security of Shannon's OTP, we can say that $p_{hyb-0} = p_{hyb-1}$.\\ \\ 
+    \textbf{Claim 2:} $| p_{b} - p_{hyb-b} |$ is negligible \\
+    \textit{Proof:} We can show the contra-positive by creating a reduction $\calB$ such that, if there exists a ppt. adversary $\calA$ which can distinguish between $p_{b}$ and $p_{hyb-b}$ with non-negligible probability, the using $\calA$, the reduction $\calB$ can break the PRF security with non-negligible advantage.\\
+    The reduction $\calB$ works as follows : 
+    \begin{itemize}
+        \item The reduction receives $(m_{i0}, m_{i1})$ from the adversary. It samples a $r_i \leftarrow \calR$ and forwards $r_i$ and $m_{ib}$ one by one to the PRF challenger.
+        \item The reduction receives $y_i$ and $z_i$ from the challenger. It then forwards $(r, y_i \oplus m_{ib}, z_i)$ to the adversary $\calA$.
+        \item Finally, the reduction receives $b'$ from the advesary. It forwards $b'$ to the PRF challenger.
+    \end{itemize}
+    If the PRF challenger chooses $F(k, .)$ (i.e. psuedorandom), then that corresponds to World-b for the adversary $\calA$ and it sends $b' = 0$ with probability $p_b$. On the other hand, if the challenger chooses $f(.)$ (i.e. truly random), then that corresponds to Hybrid-World-b for the adversary and it sends $b' = 1$ with probability $p_hyb-b$.
+    So the winning advantage of the reduction $\calB$ would then become :
+    $$\prf[\calB, \calF] = | p_{b} - p_{hyb-b} |$$ So, if $| p_{b} - p_{hyb-b} |$ is non-negligible, then our reduction $\calB$ can win the PRF game with non-negligible advantage. Hence $| p_{b} - p_{hyb-b} |$ is negligible.\\ 
+    So using the above two claims, we can say that :
+$$\mathsf{CPAAdv}[\calA, \calE] = |p_0 - p_1| = \epsilon$$ \\ \\ 
+To prove the Very Weak Ciphertext Integrity of $\calE$, we will setup two games as follows : \\ \\ 
+\textbf{Game 0 :} 
+\begin{itemize}
+    \item The challenger encrypts the messages using the encryption scheme $\calE$. 
+    \item The adversary sends a ciphertext $ct$ to the challenger. The adversary wins if $ct$ is a valid ciphertext.
+\end{itemize}
+Let $Pr[\text{A wins Game 0}] = p_0$ \\ \\
+\textbf{Game 1 :} 
+\begin{itemize}
+    \item The challenger encrypts the messages using the encryption scheme : 
+    $$\enc(k, m) = (r, f(r) \oplus m, f(m))$$ where $f$ is a uniformly random function.
+    \item The adversary sends a ciphertext $ct$ to the challenger. The adversary wins if $ct$ is a valid ciphertext.
+\end{itemize}
+Let $Pr[\text{A wins Game 1}] = p_1$ \\ \\
+\textbf{Claim 1: } $p_1 = \epsilon$, where $\epsilon$ is negligible.
+\textit{Proof : } This is because $f$ is a uniformly random function, therefore $\calA$ can never predict the output of $f$ on a new input which it hasn't seen before. So, at best, $\calA$ can only predict the output with probability $\frac{1}{|\calY|}$, where $\calY$ is the output space. This probability is negligible as $|\calY| = 2^n$. \\ \\ 
+\textbf{Claim 2: } $|p_0 - p_1|$ is negligible.
+\textit{Proof:} If the above claim is not true, i.e. if there exists an adversary $\calA$ which can distinguish between game 0 and game 1, then we can create a reduction $\calB$, such that $\calB$ wins PRF game with non-negligible advantage using adversary $\calA$. \\
+The reduction $\calB$ works as follows:
+\begin{itemize}
+    \item The reduction encrypts messages by sampling $r \leftarrow \calR$, and sending $r$ and message $m$ one by one to the PRF challenger. It receives $y$ and $z$ from the challenger and the encryption it calculates is : $(r, y \oplus m, z)$.
+    \item It receives the encryption $ct = (ct_0, ct_1, ct_2)$ from $\calA$. It then sends $ct_0$ to $\calC$ and gets $y'$. Then it sends $ct_1 \oplus y'$ to $\calC$ and gets $z'$.
+    \item  If $z' = ct_2$ then $\calB$ sends 0, else it sends 1 to the PRF challenger.
+\end{itemize}
+Here, the adversary sends a valid ciphertext $ct$ to the reduction. If challenger chooses pseudorandom, then the ciphertext is of form : $(r, F(k, r) \oplus m, F(k, m))$, and the reduction guesses 0 with probability $p_0$ (because then $y' = F(k, r)$, $ct_1 \oplus y' = m$ and $z' = F(k, m)$, which reduction compares with $ct_2$). Else if the challenger chooses truly random, then the reduction sends 1 with probability $p_1$. Hence $ \prf[\calB, \calF] = | p_0 - p_1 | $. Hence proved.
 \end{solution}
 
 
@@ -314,7 +383,76 @@
 
 \prob{3 : One-time secure MACs, and Upgrading One-Time MACs to Many-Time MACs}
 \begin{solution}
+    \begin{enumerate}[(a)]
+        \item We construct the following One-Query Unconditionally Secure MAC scheme $\calI = (\sign, \verif)$ : 
+        $$\sign(k, m) = (m \wedge k_1) \vee k_2$$ and 
+        $$\verif(k, m, \sigma) = \begin{cases}
+                      1 & \text{if } \sigma =  (m \wedge k_1) \vee k_2\\
+                      0 & \text{Otherwise}
+              \end{cases}$$
+        where $k = (k_1, k_2)$ is sampled from keyspace $\calK = \bit^{2n}$ ($k_1$ and $k_2$ are n bits each). Also the ciphertext space is $\bit^n$. \\ \\ 
+        \textbf{Claim :} The winning probability of an computationally unbounded adversary $\calA$ is bounded by $\frac{1}{2^n}$, and hence is negligible. \\
+        \textit{Proof :} On getting the signature of some message $m \epsilon \calM$, the adversary knows $m$, $\sigma$ and $n$ but doesn't know $(k_1, k_2)$. So if the adversary enumerates all such possible pairs of $(k_1, k_2)$ which satisfies this equation, then there are about $2^n$ such pairs. \\ 
+        To prove this, consider the $i^{th}$ bit of message m ($m_i$) and corresponding bit in $\sigma$ ($\sigma_i$). Also take $i^{th}$ bits of $k_1$ and $k_2$ as $a_1$ and $a_2$. \\
+        \textbf{Case 1:} $m_i = 0$ and $\sigma_i = 0$ \\
+        \textit{Possibilities:} for $a_1 = 0$, $a_2$ can only be 0 and for $a_1 = 1$, $a_2$ can be only 0. (2 pairs of $(k_1, k_2)$)\\
+        \textbf{Case 2:} $m_i = 0$ and $\sigma_i = 1$ \\
+        \textit{Possibilities:} for $a_1 = 0$, $a_2$ can only be 1 and for $a_1 = 1$, $a_2$ can be only 1. (2 pairs of $(k_1, k_2)$)\\
+        \textbf{Case 3:} $m_i = 1$ and $\sigma_i = 1$ \\
+        \textit{Possibilities:} for $a_1 = 0$, $a_2$ can only be 1 and for $a_1 = 1$, $a_2$ can be both 0 and 1. (3 pairs of $(k_1, k_2)$)\\
+        \textbf{Case 4:} $m_i = 1$ and $\sigma_i = 0$ \\
+        \textit{Possibilities:} for $a_1 = 0$, $a_2$ can only be 0 and for $a_1 = 1$, there is no possible value of $a_2$. (1 pair of $(k_1, k_2)$)\\
+        So overall there are $2^n$ expected number of pairs of $k1$ \text{and} $k2$ satisfying our equation. \\ \\ 
+        Now if the adversary wants to send forgery $\sigma'$ of some different message $m'$, such that $\sigma' = (k_{i1} \wedge m') \vee k_{i2}$, where $k_{i1}$ is some choice of key $k_1$ by $\calA$ and $k_{i2}$ is the corresponding key $k_2$ which satisfies $\sigma = (m \wedge k_{i1}) \vee k_{i2}$. But for different choices of $k_{i1}$, the corresponding $\sigma'$ is different. So there are $2^n$ different equally likely choices of $\sigma'$ which the adversary can send as forgery out of which only one is correct.\\
+        Hence our one-query Unconditionally Secure MAC is secure even against an unbounded adversary.
 
+        \item To prove the security of our MAC scheme $\calI = (\sign, \verif)$, we setup the following games : \\ \\
+        \textbf{Game 0:} This is the usual MAC security game.
+        \begin{itemize}
+                  \item \textbf{Setup Phase :} Challenger chooses a PRF key $k = (k_1, k_2)$ where $k_1 \epsilon \calK_1$ and $k_2 \epsilon \calK_2$.
+                  \item \textbf{Query Phase :} Adversary sends polynomially many queries. For the $i^{th}$ query $m_i$, the challenger chooses a random string $r_i \leftarrow \calX$ and sends $\sigma_i = \sign(k, m_i ; r_i)$ to the adversary.
+                  \item \textbf{Forgery :} Finally, the adversary outputs $(m^*, \sigma^*)$ such that $(m^*, \sigma^*) \neq (m_i, \sigma_i)$ for all i.
+        \end{itemize}
+         Let the winning probability of Adversary $\calA$ in Game 0 be $p_0$. \\ \\ 
+        \textbf{Game 1:} This is similar to previous game except the PRF is replaced by a uniformly random function.
+        \begin{itemize}
+                  \item \textbf{Setup Phase :} Challenger chooses a PRF key $k = (k_1, k_2)$ where $k_1 \epsilon \calK_1$ and $k_2 \epsilon \calK_2$. It also samples a unifromly random function $f \leftarrow Func[\calX, \calT]$.
+                  \item \textbf{Query Phase :} Adversary sends polynomially many queries. For the $i^{th}$ query $m_i$, the challenger chooses a random string $r_i \leftarrow \calX$ and sends $\sigma_i = (r, \sign_1(k_1, m_i) \oplus f(r_i))$ to the adversary.
+                  \item \textbf{Forgery :} Finally, the adversary outputs $(m^*, \sigma^*)$ such that $(m^*, \sigma^*) \neq (m_i, \sigma_i)$ for all i.
+        \end{itemize}
+         Let the winning probability of Adversary $\calA$ in Game 1 be $p_1$. \\ \\ 
+        \textbf{Game 2:} This is similar to previous game except the signature is replaced by a uniformly random function.
+        \begin{itemize}
+                  \item \textbf{Setup Phase :} Challenger chooses a PRF key $k = (k_1, k_2)$ where $k_1 \epsilon \calK_1$ and $k_2 \epsilon \calK_2$. It also samples two unifromly random functions $f \leftarrow Func[\calX, \calT]$ and $f' \leftarrow Func[\calM_1, \calT]$.
+                  \item \textbf{Query Phase :} Adversary sends polynomially many queries. For the $i^{th}$ query $m_i$, the challenger chooses a random string $r_i \leftarrow \calX$ and sends $\sigma_i = (r, f'(m_i) \oplus f(r_i))$ to the adversary.
+                  \item \textbf{Forgery :} Finally, the adversary outputs $(m^*, \sigma^*)$ such that $(m^*, \sigma^*) \neq (m_i, \sigma_i)$ for all i.
+        \end{itemize}
+         Let the winning probability of Adversary $\calA$ in Game 2 be $p_2$. \\ \\ 
+         \textbf{Claim 1:} $p_2 = \epsilon$, where $\epsilon$ is a negligible function. \\
+         \textit{Proof:} This is because $f$ and $f'$ are truly random functions and the adversary can never predict the output of these functions at some input (Using Shannon's security). It can only guess the output with a probability of $\frac{1}{|\calT|}$. So the value of $p_2$ is negligible. \\ \\ 
+         \textbf{Claim 2:} $|p_1 - p_0|$ is negligible. \\
+         \textit{Proof:} This follows from the security of the PRF function. Suppose there exists an adversary $\calA$ that can distinguish between the two games (i.e. $|p_1 - p_0|$ is non-negligible), then we can construct a reduction $\calB$ which uses this adversary to win the PRF game with non-negligible advantage.//
+         The reduction works as follows:
+         \begin{itemize}
+             \item It samples $r_i \leftarrow \calX$ for the $i^{th}$ query. It sends this to the PRF challenger and receives $y_i$.
+             \item It then sends $(r_i, y_i \oplus \sign_1(k_1, m))$ to the adversary. The adversary finally outputs a forgery $(m^*, \sigma^*)$, where $\sigma^* = (\sigma^*_0, \sigma^*_1)$
+             \item The reduction then sends a final query $\sigma^*_0$ to the PRF challenger and receives $y^*$. If $y^* = \sigma^*_1 \oplus \sign_1(k_1, m^*)$ then the reduction sends 1, else it sends 0.
+         \end{itemize}
+         If the PRF challenger chooses pseudorandom, then the reduction will output 0 with a probability of $p_0$ else if the PRF challenger chooses completely random function, then the reduction sends 1 with probability $p_1$.\\
+         Hence the $\mathsf{PRFAdv}[\calB, \calF] = |p_0 - p_1|$, which is negligible. 
+         \\ \\ 
+         \textbf{Claim 3:} $|p_2 - p_1|$ is also negligible. \\
+         \textit{Proof:} Suppose in game 1, the adversary sends a forgery as $(m^*, \sigma^*)$. We can then write $p_1$ as follows: \\
+         $p_1 = Pr[\text{A wins game 1 and A also knows $\sign_1(k_1, m^*)$}] +$ \\ 
+         $Pr[\text{A wins game 1 and A doesn't know $\sign_1(k_1, m^*)$}]$
+        \\
+        The second case (A wins game 1 but A doesn't know $\sign_1(k_1, m^*)$) is equivalent to game 2, since A doesn't was not able to compute the function, $\sigma_1$ behaves as a random function for the adversary. So we can write : 
+        $$|p_1 - p_2| = Pr[\text{A wins game 1 and A also knows $\sign_1(k_1, m^*)$}]$$ and from this , 
+        $$|p_1 - p_2| \leq Pr[\text{A knows $\sign_1(k_1, m^*)$}]$$
+        Now we can say that the above term is negligible using one-query security of $\sigma_1$. This is because in all the queries of the adversary, we sent the signature as $f(r) \oplus \sigma_1$ where $f(r)$ is some truly random function. Using Shannon's security, we can say that $f(r) \oplus \sigma_1$ is also completely random to the adversary. So the probability that adversary sends $\sign_1(k_1, m^*)$ without knowing the signature of any other message $m \epsilon \calM$ is negligible because $\sigma_1$ is one-query secure. \\ \\ 
+        Hence using all the above three claims, we can say that our MAC scheme $\calI$ is secure.
+        
+    \end{enumerate}
 \end{solution}
 
 
