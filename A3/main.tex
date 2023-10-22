@@ -325,7 +325,8 @@
 
 \prob{4 : CCA Security v/s Authenticated Encryption}
 \begin{solution}
-
+    Here we need to show that CCA+PT-INT $\implies$ CT-INT. Intuitively, this is true because if an adversary breaks CT-INT, he produces a ciphertext of (1) a previously queried message or (2) a new message.
+    If (1) happens then CCA breaks and if (2) happens then PT-INT breaks.
 \end{solution}
 
 \prob{5: Modular Arithmetic and Basic Group Theory}
@@ -346,39 +347,110 @@
               $$|\{y\in\Z_6:y^2+y=0\mod6\}|=3>2$$
 
         \item For this part, we will use Fermat's Little Theorem.
-        \begin{theorem}[Fermat's Little Theorem]
-            For any prime number $p$ and $a\in\Z$
-            $$a^{p-1}=1\mod p$$
-        \end{theorem}
-            \begin{proof}
-                We use the following observation:
-                
-                \textbf{Observation:} Let $a \in\Z^*_p$. Consider the set $S_a = \{a\cdot i: i\in\Z^*_p\}$. Then $S_a = \Z^*_p$. 
-                
-                Otherwise, suppose there exist $i,j\in\Z^*_p$ such that $$a\cdot i \mod p= a\cdot j\mod p\implies p | a (i-j)\implies i=j$$
+              \begin{theorem}[Fermat's Little Theorem]
+                  For any prime number $p$ and $a\in\Z$
+                  $$a^{p-1}=1\mod p$$
+              \end{theorem}
+              \begin{proof}
+                  We use the following observation:
 
-                Now consider the product of all elements of $S_a$
+                  \textbf{Observation:} Let $a \in\Z^*_p$. Consider the set $S_a = \{a\cdot i: i\in\Z^*_p\}$. Then $S_a = \Z^*_p$.
 
-                $$\prod_{a_i\in S_a}a_i=\prod_{i=1}^{p-1}a\cdot i=a^{p-1}\prod_{i\in\Z^*_p}i$$
-                Since $S_a = \Z^*_p$, the products on both sides must be the same. Hence $$a^{p-1}=1\mod p$$
+                  Otherwise, suppose there exist $i,j\in\Z^*_p$ such that $$a\cdot i \mod p= a\cdot j\mod p\implies p | a (i-j)\implies i=j$$
+
+                  Now consider the product of all elements of $S_a$
+
+                  $$\prod_{a_i\in S_a}a_i=\prod_{i=1}^{p-1}a\cdot i=a^{p-1}\prod_{i\in\Z^*_p}i$$
+                  Since $S_a = \Z^*_p$, the products on both sides must be the same. Hence $$a^{p-1}=1\mod p$$
 
 
-            \end{proof}
-        Let $a\in\Z_p$ and $r=\ord(a)$. Then $a^r=1\mod p$. By Fermat's Little Theorem:
+              \end{proof}
+              Let $a\in\Z_p$ and $r=\ord(a)$. Then $a^r=1\mod p$. By Fermat's Little Theorem:
               $$a^{p-1}=1\mod p$$
               Suppose by the division algorithm, $p-1=rq+s$, $s<r$. Since $a^{p-1}=1\mod p$ and $a^{r}=1\mod p$, $$a^{p-1-rq}=1\mod p$$ and hence $a^{s}=1\mod p$. But since $s<r$, $s$ must be 0.
 
         \item Observe that the given distribution $\calD_0$ is a modification of the $\ddh$ distibution $$\calD'_0=\{(g, g^a, g^b, g^{a\cdot b}) : g\gets G, a,b\gets\Z^*_p \}$$ where $b=a^2$. So, an Adversary which can distinguish between $\calD'_0$ and $\calD_1$ should also be able to distinguish between $\calD_0$ and $\calD_1$.
-        
-        The reduction $\calB$ simply forwards the message it receives from the challenger to $\calA$ and forwards the output of $\calA$ to $\calC$ as showin in \cref{fig:p5d}
-        \begin{figure}[!ht]
-            \centering
-            \includegraphics[scale=0.25]{images/Reduction5d.jpg}
-            \caption{Reduction for Problem 5d}
-            \label{fig:p5d}
-        \end{figure}
-  
-        \item TODO
+
+              The reduction $\calB$ simply forwards the message it receives from the challenger to $\calA$ and forwards the output of $\calA$ to $\calC$ as showin in \cref{fig:p5d}
+              \begin{figure}[!ht]
+                  \centering
+                  \includegraphics[scale=0.25]{images/Reduction5d.jpg}
+                  \caption{Reduction for Problem 5d}
+                  \label{fig:p5d}
+              \end{figure}
+
+        \item Let $S_i$ denote the set of matrices $M\in\Z_q^{t\times t}$ where the last $i$ rows are of the form
+              $$\lambda_j (v_1 \dots v_t),\hspace{20pt} j\in[i], (v_1 \dots v_t)\gets\Z_q^t, \lambda_j\gets\Z_q$$
+
+              and the remaining rows have elements sampled at random from $\Z_q$. In other words, last $i$ rows are random multiples of some tuple (chosen at random) and remaining rows are drawn at random. Observe that $S_n=\mathsf{Rank}_1[t,q]$ and $S_1=\Z_q^{t\times t}$.
+
+              The proof proceedes by a sequence of $n$ hybrid worlds:
+              \begin{world}[Hybrid World $\mathbf{i}$:]
+                  The Challenger samples from the distribution $$\calD'_i=\{(g,g^\mathbf{M}): g\gets G,\mathbf{M}\gets S_i \}$$
+              \end{world}
+              Observe that Hybrid World 1 corresponds to sampling from $\calD_1$ and Hybrid World $n$ corresponds to sampling from  $\calD_1$ specified in the question.
+              Let $p_i$ be the probability of the Adversary outputting 0 in the above Hybrids.
+
+              \textbf{Claim:} If there exists an adversary $\calA$ such that $|p_i-p_{i+1}|$ is non-negligible then there exists an adversary $\calB$ which solves the DDH problem for group $G$.
+              Consider the following reduction:
+              \securitygame{Reduction}{Reduction for Problem 5e}{\label{red:p5e}}
+              {
+                  \begin{itemize}
+                      \item $\calC$ samples $b\gets\bit$ and $g\gets G$. He calculates $g^\alpha, g^\beta$ and $w_0=g^{\alpha\cdot\beta}, w_1=g^\gamma$ where $\alpha,\beta,\gamma\gets\Z_q$ and sends $(g, g^\alpha, g^\beta, w_b)$ th $\calB$
+                      \item $\calB$ samples the following:
+                            $$\beta_1,\beta_2,\dots\beta_{t-1}\gets\Z_q$$
+                            $$\lambda_1,\lambda_2,\dots\lambda_{i}\gets\Z_q$$
+                            $$v_{i,j}\gets\Z_q\hspace{20pt}1\leq i\leq {t-i-1}, 1\leq j \leq t$$
+                            And computes the matrix:
+                            $$
+                                \begin{bmatrix}
+                                    g^{v_{1,1}}        & g^{v_{1,2}}          & \dots  & g^{v_{1,t}}              \\
+                                    \vdots             & \vdots               & \ddots & \vdots                   \\
+                                    g^{v_{t-i-1,1}}    & g^{v_{t-i-1,2}}      & \dots  & g^{v_{t-i-1,t}}          \\
+                                    w_b                & g^{\alpha\beta_1}    & \dots  & g^{\alpha\beta_{t-1}}    \\
+                                    g^{\lambda_i\beta} & g^{\lambda_i\beta_1} & \dots  & g^{\lambda_i\beta_{t-1}} \\
+                                    \vdots             & \vdots               & \ddots & \vdots                   \\
+                                    g^{\lambda_1\beta} & g^{\lambda_1\beta_1} & \dots  & g^{\lambda_1\beta_{t-1}}
+                                \end{bmatrix}
+                            $$
+                            And sends it to $\calA$
+
+                      \item $\calA$ responds with a bit $b'$ which $\calB$ forwards to $\calC$
+                  \end{itemize}
+              }
+              Observe that if $b=0$ then it corresponds to Hybrid World $i$ and if $b=1$ then it corresponds to Hybrid World $i+1$. This is because the matrix
+              $$
+                  \begin{bmatrix}
+                      {v_{1,1}}        & {v_{1,2}}          & \dots  & {v_{1,t}}              \\
+                      \vdots           & \vdots             & \ddots & \vdots                 \\
+                      {v_{t-i-1,1}}    & {v_{t-i-1,2}}      & \dots  & {v_{t-i-1,t}}          \\
+                      \alpha\beta      & {\alpha\beta_1}    & \dots  & {\alpha\beta_{t-1}}    \\
+                      {\lambda_i\beta} & {\lambda_i\beta_1} & \dots  & {\lambda_i\beta_{t-1}} \\
+                      \vdots           & \vdots             & \ddots & \vdots                 \\
+                      {\lambda_1\beta} & {\lambda_1\beta_1} & \dots  & {\lambda_1\beta_{t-1}}
+                  \end{bmatrix}
+              $$
+              Has the last $i+1$ rows as the multiple of the tuple $(\beta, \beta_1, \beta_2\dots\beta_{t-1})$ while
+              $$
+                  \begin{bmatrix}
+                      {v_{1,1}}        & {v_{1,2}}          & \dots  & {v_{1,t}}              \\
+                      \vdots           & \vdots             & \ddots & \vdots                 \\
+                      {v_{t-i-1,1}}    & {v_{t-i-1,2}}      & \dots  & {v_{t-i-1,t}}          \\
+                      \gamma     & {\alpha\beta_1}    & \dots  & {\alpha\beta_{t-1}}          \\
+                      {\lambda_i\beta} & {\lambda_i\beta_1} & \dots  & {\lambda_i\beta_{t-1}} \\
+                      \vdots           & \vdots             & \ddots & \vdots                 \\
+                      {\lambda_1\beta} & {\lambda_1\beta_1} & \dots  & {\lambda_1\beta_{t-1}}
+                  \end{bmatrix}
+              $$
+              Has the last $i$ rows as the multiple of the tuple $(\beta, \beta_1, \beta_2\dots\beta_{t-1})$. Hence, $$\mathsf{DDHAdv}[\calB, \calC]=|p_i-p_{i+1}|$$
+            
+            
+            Hence we observe that the hybrid worlds are computationally indistinguishable. Assuming that the DDH problem is hard on $G$,
+            $$|p_1-p_{n}|\leq \sum_i=1^{n-1}|p_i-p_{i+1}|$$
+            Which is negligible assuming $|p_i-p_{i+1}|$ is negligible. So, $\calD_0$ and $\calD_1$ are computationally indistinguishable.
+
+
+
     \end{enumerate}
 \end{solution}
 
