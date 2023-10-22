@@ -320,8 +320,49 @@
 
 \prob{4 : CCA Security v/s Authenticated Encryption}
 \begin{solution}
-    Here we need to show that CCA+PT-INT $\implies$ CT-INT. Intuitively, this is true because if an adversary breaks CT-INT, he produces a ciphertext of (1) a previously queried message or (2) a new message.
-    If (1) happens then CCA breaks and if (2) happens then PT-INT breaks.
+    \begin{enumerate}[(a)]
+        \item Here we need to show that CCA+PT-INT $\implies$ CT-INT. Intuitively, this is true because if an adversary breaks CT-INT, he produces a ciphertext of (1) a previously queried message or (2) a new message. If (1) happens then CCA breaks and if (2) happens then PT-INT breaks.
+
+              Let $\calE=(\enc,\dec)$ be an encryption scheme that follows CCA and PT-INT. We will show that it satisfies CT-INT. Consider the following worlds:
+              \begin{world}[World 0:]
+                  This is the CT-INT game
+              \end{world}
+
+              \begin{world}[Hybrid Word]
+                  This is the CT-INT game but the $\ct^*$ given as output by the adversary decrupts to one of the previously queried messages: $\dec(k,ct^*)\notin\{m_i\}$
+              \end{world}
+
+              Let $p_0$ and $p_\hyb$ be the winning probabilities of the adversary in World 0 and Hybrid World respectively.
+
+              \textbf{Claim:} If there exists an adversary for which $|p_0-p_\hyb|$ is non-negligible then there exists a reduction $\calB$ which breaks the PT-INT of $\calE$
+              \begin{proof}
+                  Indeed, if $p_0$ and $p_\hyb$ are far apart then the probability that the output $\ct^*$ given by $\calA$ decrypts to a message different from the queried messages is non-negligible. The reduction simply forwards $\ct^*$ to the PT-INT challenger and wins with probability $|p_0-p_\hyb|$
+              \end{proof}
+
+              \textbf{Claim:} If there exists an adversary for which $p_\hyb$ is non-negligible then there exists a reduction $\calB$ which breaks the CCA security of $\calE$
+              \begin{proof}
+                  Consider the following reduction:
+                  \securitygame{Reduction}{Reduction for Problem 4a}{\label{red:p4a}}
+                  {
+                      \begin{itemize}
+                          \item $\calA$ sends $m_i$ to $\calB$
+                          \item $\calB$ samples $m\gets\calM$ and sends encryption query $(m_i,m)$ to CCA challenger $\calC$
+                          \item $\calC$ replies with $\ct_i$ which $\calB$ forwards to $\calA$
+                          \item Finally, $\calA$ outputs $\ct^*$ which $\calB$ forwards to $\calC$ for decryption. If the output is $\perp$, $\calB$ outputs 1 otherwise it outputs 0
+                      \end{itemize}
+                  }
+                  Let the number of queries made by $\calA$ be $Q$ and the message space be $\calM$.
+
+                  Now, if the challenger chooses $b=0$ then it is the same as the CT-INT game.  $$\Pr[b'=0|b=0]=p_\hyb$$
+                  If challenger choose $b=1$ then for all its queries, $\calA$ gets the encryption of a random message $m$. The probability of outputing 0 here will be bounded by the probability that $m\in\{m_i\}$ which is
+                  $$\Pr[\exists m_i : m=m_i]\leq\frac{Q}{|\calM|}$$
+                  Thus, $$\Pr[b'=0|b=1]\leq \frac{Q}{|\calM|}$$
+                  $$\mathsf{CCAAdv}[\calB, \calC]\geq p_\hyb-\frac{Q}{|\calM|}$$
+                  Which is non-negligible assuming $\calM$ to be superpolynomial.
+              \end{proof}
+        \item 
+    \end{enumerate}
+
 \end{solution}
 
 \prob{5: Modular Arithmetic and Basic Group Theory}
@@ -387,74 +428,74 @@
               Let $p_i$ be the probability of the Adversary outputting 0 in the above Hybrids.
 
               \textbf{Claim:} If there exists an adversary $\calA$ such that $|p_i-p_{i+1}|$ is non-negligible then there exists an adversary $\calB$ which solves the DDH problem for group $G$.
-              
-              
-              Consider the following reduction:
+
+              \begin{proof}
+                  Consider the following reduction:
 
 
-              \securitygame{Reduction}{Reduction for Problem 5e}{\label{red:p5e}}
-              {
-                  \begin{itemize}
-                      \item $\calC$ samples $b\gets\bit$ and $g\gets G$. He calculates $g^\alpha, g^\beta$ and $w_0=g^{\alpha\cdot\beta}, w_1=g^\gamma$ where $\alpha,\beta,\gamma\gets\Z_q$ and sends $(g, g^\alpha, g^\beta, w_b)$ th $\calB$
-                      \item $\calB$ samples the following:
-                            $$\beta_1,\beta_2,\dots\beta_{t-1}\gets\Z_q$$
-                            $$\lambda_1,\lambda_2,\dots\lambda_{i}\gets\Z_q$$
-                            $$v_{i,j}\gets\Z_q\hspace{20pt}1\leq i\leq {t-i-1}, 1\leq j \leq t$$
-                            And computes the matrix:
-                            $$
-                                \begin{bmatrix}
-                                    g^{v_{1,1}}        & g^{v_{1,2}}          & \dots  & g^{v_{1,t}}              \\
-                                    \vdots             & \vdots               & \ddots & \vdots                   \\
-                                    g^{v_{t-i-1,1}}    & g^{v_{t-i-1,2}}      & \dots  & g^{v_{t-i-1,t}}          \\
-                                    w_b                & g^{\alpha\beta_1}    & \dots  & g^{\alpha\beta_{t-1}}    \\
-                                    g^{\lambda_i\beta} & g^{\lambda_i\beta_1} & \dots  & g^{\lambda_i\beta_{t-1}} \\
-                                    \vdots             & \vdots               & \ddots & \vdots                   \\
-                                    g^{\lambda_1\beta} & g^{\lambda_1\beta_1} & \dots  & g^{\lambda_1\beta_{t-1}}
-                                \end{bmatrix}
-                            $$
-                            And sends it to $\calA$
+                  \securitygame{Reduction}{Reduction for Problem 5e}{\label{red:p5e}}
+                  {
+                      \begin{itemize}
+                          \item $\calC$ samples $b\gets\bit$ and $g\gets G$. He calculates $g^\alpha, g^\beta$ and $w_0=g^{\alpha\cdot\beta}, w_1=g^\gamma$ where $\alpha,\beta,\gamma\gets\Z_q$ and sends $(g, g^\alpha, g^\beta, w_b)$ th $\calB$
+                          \item $\calB$ samples the following:
+                                $$\beta_1,\beta_2,\dots\beta_{t-1}\gets\Z_q$$
+                                $$\lambda_1,\lambda_2,\dots\lambda_{i}\gets\Z_q$$
+                                $$v_{i,j}\gets\Z_q\hspace{20pt}1\leq i\leq {t-i-1}, 1\leq j \leq t$$
+                                And computes the matrix:
+                                $$
+                                    \begin{bmatrix}
+                                        g^{v_{1,1}}        & g^{v_{1,2}}          & \dots  & g^{v_{1,t}}              \\
+                                        \vdots             & \vdots               & \ddots & \vdots                   \\
+                                        g^{v_{t-i-1,1}}    & g^{v_{t-i-1,2}}      & \dots  & g^{v_{t-i-1,t}}          \\
+                                        w_b                & g^{\alpha\beta_1}    & \dots  & g^{\alpha\beta_{t-1}}    \\
+                                        g^{\lambda_i\beta} & g^{\lambda_i\beta_1} & \dots  & g^{\lambda_i\beta_{t-1}} \\
+                                        \vdots             & \vdots               & \ddots & \vdots                   \\
+                                        g^{\lambda_1\beta} & g^{\lambda_1\beta_1} & \dots  & g^{\lambda_1\beta_{t-1}}
+                                    \end{bmatrix}
+                                $$
+                                And sends it to $\calA$
 
-                      \item $\calA$ responds with a bit $b'$ which $\calB$ forwards to $\calC$
-                  \end{itemize}
-              }
+                          \item $\calA$ responds with a bit $b'$ which $\calB$ forwards to $\calC$
+                      \end{itemize}
+                  }
 
-              \begin{figure}[!ht]
-                \centering
-                \includegraphics[scale=0.25]{images/Reduction5e.jpg}
-                \caption{Reduction for Problem 5e}
-                \label{fig:p5e}
-            \end{figure}
+                  \begin{figure}[!ht]
+                      \centering
+                      \includegraphics[scale=0.25]{images/Reduction5e.jpg}
+                      \caption{Reduction for Problem 5e}
+                      \label{fig:p5e}
+                  \end{figure}
 
-              Observe that if $b=0$ then it corresponds to Hybrid World $i+1$ and if $b=1$ then it corresponds to Hybrid World $i$. This is because the matrix
-              $$
-                  \begin{bmatrix}
-                      {v_{1,1}}        & {v_{1,2}}          & \dots  & {v_{1,t}}              \\
-                      \vdots           & \vdots             & \ddots & \vdots                 \\
-                      {v_{t-i-1,1}}    & {v_{t-i-1,2}}      & \dots  & {v_{t-i-1,t}}          \\
-                      \alpha\beta      & {\alpha\beta_1}    & \dots  & {\alpha\beta_{t-1}}    \\
-                      {\lambda_i\beta} & {\lambda_i\beta_1} & \dots  & {\lambda_i\beta_{t-1}} \\
-                      \vdots           & \vdots             & \ddots & \vdots                 \\
-                      {\lambda_1\beta} & {\lambda_1\beta_1} & \dots  & {\lambda_1\beta_{t-1}}
-                  \end{bmatrix}
-              $$
-              Has the last $i+1$ rows as the multiple of the tuple $(\beta, \beta_1, \beta_2\dots\beta_{t-1})$ while
-              $$
-                  \begin{bmatrix}
-                      {v_{1,1}}        & {v_{1,2}}          & \dots  & {v_{1,t}}              \\
-                      \vdots           & \vdots             & \ddots & \vdots                 \\
-                      {v_{t-i-1,1}}    & {v_{t-i-1,2}}      & \dots  & {v_{t-i-1,t}}          \\
-                      \gamma     & {\alpha\beta_1}    & \dots  & {\alpha\beta_{t-1}}          \\
-                      {\lambda_i\beta} & {\lambda_i\beta_1} & \dots  & {\lambda_i\beta_{t-1}} \\
-                      \vdots           & \vdots             & \ddots & \vdots                 \\
-                      {\lambda_1\beta} & {\lambda_1\beta_1} & \dots  & {\lambda_1\beta_{t-1}}
-                  \end{bmatrix}
-              $$
-              Has the last $i$ rows as the multiple of the tuple $(\beta, \beta_1, \beta_2\dots\beta_{t-1})$. Hence, $$\mathsf{DDHAdv}[\calB, \calC]=|p_i-p_{i+1}|$$
-            
-            \vspace{20pt}
-            Therefore we observe that the hybrid worlds are computationally indistinguishable. Assuming that the DDH problem is hard on $G$,
-            $$|p_1-p_{n}|\leq \sum_{i=1}^{n-1}|p_i-p_{i+1}|$$
-            Which is negligible assuming $|p_i-p_{i+1}|$ is negligible. So, $\calD_0$ and $\calD_1$ are computationally indistinguishable.
+                  Observe that if $b=0$ then it corresponds to Hybrid World $i+1$ and if $b=1$ then it corresponds to Hybrid World $i$. This is because the matrix
+                  $$
+                      \begin{bmatrix}
+                          {v_{1,1}}        & {v_{1,2}}          & \dots  & {v_{1,t}}              \\
+                          \vdots           & \vdots             & \ddots & \vdots                 \\
+                          {v_{t-i-1,1}}    & {v_{t-i-1,2}}      & \dots  & {v_{t-i-1,t}}          \\
+                          \alpha\beta      & {\alpha\beta_1}    & \dots  & {\alpha\beta_{t-1}}    \\
+                          {\lambda_i\beta} & {\lambda_i\beta_1} & \dots  & {\lambda_i\beta_{t-1}} \\
+                          \vdots           & \vdots             & \ddots & \vdots                 \\
+                          {\lambda_1\beta} & {\lambda_1\beta_1} & \dots  & {\lambda_1\beta_{t-1}}
+                      \end{bmatrix}
+                  $$
+                  Has the last $i+1$ rows as the multiple of the tuple $(\beta, \beta_1, \beta_2\dots\beta_{t-1})$ while
+                  $$
+                      \begin{bmatrix}
+                          {v_{1,1}}        & {v_{1,2}}          & \dots  & {v_{1,t}}              \\
+                          \vdots           & \vdots             & \ddots & \vdots                 \\
+                          {v_{t-i-1,1}}    & {v_{t-i-1,2}}      & \dots  & {v_{t-i-1,t}}          \\
+                          \gamma           & {\alpha\beta_1}    & \dots  & {\alpha\beta_{t-1}}    \\
+                          {\lambda_i\beta} & {\lambda_i\beta_1} & \dots  & {\lambda_i\beta_{t-1}} \\
+                          \vdots           & \vdots             & \ddots & \vdots                 \\
+                          {\lambda_1\beta} & {\lambda_1\beta_1} & \dots  & {\lambda_1\beta_{t-1}}
+                      \end{bmatrix}
+                  $$
+                  Has the last $i$ rows as the multiple of the tuple $(\beta, \beta_1, \beta_2\dots\beta_{t-1})$. Hence, $$\mathsf{DDHAdv}[\calB, \calC]=|p_i-p_{i+1}|$$
+              \end{proof}
+              \vspace{20pt}
+              Therefore we observe that the hybrid worlds are computationally indistinguishable. Assuming that the DDH problem is hard on $G$,
+              $$|p_1-p_{n}|\leq \sum_{i=1}^{n-1}|p_i-p_{i+1}|$$
+              Which is negligible assuming $|p_i-p_{i+1}|$ is negligible. So, $\calD_0$ and $\calD_1$ are computationally indistinguishable.
 
 
 
