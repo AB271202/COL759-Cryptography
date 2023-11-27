@@ -97,6 +97,7 @@ def get_key(key_file):
     if os.path.isfile(key_file):
         with open(key_file, 'rb') as f:
             key_pair = pickle.load(f)
+            # print(key_pair)
             return key_pair
     else:
         key_pair = gen_key(MODULUS_SIZE * 8)
@@ -142,13 +143,10 @@ def check_padding(encrypted):
     dec = decrypt_bytes(priv_key, encrypted)
     return dec[0:2] == b'\x00\x02'
 
-def main():
+if __name__ == '__main__':
     msg = 'A message for encryption'
     msg = list(bytes(msg, 'raw_unicode_escape'))
     msg = pad(msg)
 
     encrypted = encryption(msg)
     print(check_padding(encrypted))
-
-if __name__ == '__main__':
-    main()
