@@ -1,5 +1,6 @@
 \documentclass[a4paper, 11pt]{article}
 \usepackage{mdframed}
+\usepackage{hyperref}
 \usepackage{comment} 
 \usepackage{xparse}
 \usepackage{tcolorbox}
@@ -37,6 +38,16 @@
 \usepackage{indentfirst}
 \usepackage{hyperref}
 \usepackage[capitalize, nameinlink]{cleveref}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+
 % Define the colors for the code highlighting
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -78,7 +89,7 @@
 \newcommand{\hr}{\noindent\rule{7in}{2.8pt}}
 \newenvironment{solution}
     {\textit{Solution:}}
-    {\clearpage}
+    {}
 \newcommand{\prob}[1]{\begin{mdframed}[backgroundcolor=gray!20] \textbf{Problem #1}\end{mdframed}}
 \renewcommand{\qed}{\quad\qedsymbol}
 \newcommand{\bit}{\left\{0, 1\right\}}
@@ -216,7 +227,7 @@ def attack():
 
 \prob{3: Attack on RSA PKCS Padding: Bleichenbacher's attack}
 \begin{solution}
-    
+    Here we implemented Bleichenbacher's attack as mentioned in \href{https://archiv.infsec.ethz.ch/education/fs08/secsem/bleichenbacher98.pdf}{this} paper. We also referred to \href{https://youtu.be/iA6OevUmeHk?si=m38o_MBNJr53BtM8}{this} video for understanding better.
 \end{solution}
 
 \end{document}

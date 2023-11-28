@@ -1,6 +1,6 @@
 from rsa import check_padding, encryption, pad
 # from rsa import check_padding
-import math
+
 """
 Takes a ciphertext, public modulus and public exponent as input as input
 PARAMS:
@@ -25,12 +25,14 @@ def to_list(ct):
         ct = ct//256
     return cipher_text[::-1]
 
+def ceil(a, b):
+    return a // b + (a % b > 0)
 
 def step2(M, s, B, N, ct, e):
     # Find s
     if len(M) == 1:
         for (a,b) in M:
-            r = math.ceil(2*((b*s - 2*B)/N))
+            r = 2*((b*s - 2*B)//N)
             while True:
                 s1 = (2*B+r*N)//b
                 found = 0
@@ -56,14 +58,13 @@ def step2(M, s, B, N, ct, e):
 def step3(s, M, B, N):
     # Add to the set
     M1 = set()
-    for element in M:
-        a,b = element
+    for a,b in M:
         r = (a*s-3*B+1)//N
         # print(a,b)
         while r<=(b*s-2*B)//N:
             # print((3*B+r*N)//s)
-            alpha = max(a, math.ceil((2*B+r*N)/s))
-            beta = min(b, math.floor((3*B-1+r*N)/s))
+            alpha = max(a, ceil((2*B+r*N),s))
+            beta = min(b, (3*B-1+r*N)//s)
             if alpha <= beta:
                 M1.add((alpha, beta))
             r += 1
@@ -93,12 +94,14 @@ def attack(cipher_text, N, e):
     r = 0
     M = set()
     while (3*B+r*N)//s < b:
-        alpha = max(a, math.ceil((2*B+r*N)/s))
-        beta = min(b, math.floor((3*B+r*N-1)/s))
+        alpha = max(a, ceil((2*B+r*N),s))
+        beta = min(b, (3*B+r*N-1)//s)
         if alpha <= beta:
             M.add((alpha, beta))
         r += 1
     print(M)
+    # Fine till here
+
     while True:
         s = step2(M, s, B, N, ct, e)
         print("Got another s value", s)
