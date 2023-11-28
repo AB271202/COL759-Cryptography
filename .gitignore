@@ -8,3 +8,4 @@
 *.blg 
 *.bbl
 __pycache__
+.DS_Store
