@@ -222,7 +222,12 @@ def attack():
 
 \prob{2: Another Attack on RSA Signatures}
 \begin{solution}
-    
+    The attack follows in three steps : 
+    \begin{itemize}
+        \item Choose a string $s$ in such a way that it's cube doesn't exceed $\mathsf{0x000x010x00...0x00}$ by taking cube root of it.
+        \item set the last $1+|M|$ bytes (here $|M|$ denotes size of message in bytes) in such a way that the cube of $s$ (say $t$) has the last $1+|M|$ bytes as $\mathsf{0x00[M]}$. To do this, we compare $t$ (cube of $s$) and our target suffix ($\mathsf{0x00[M]}$) until we find a mismatch at some position (say $i$), upon which we flip the bit at position $i$ in $s$. This will not alter the previously matching bits and the current bit in $t$ will match the one in our target suffix. We do this until whole of the target suffix is matched in $t$.
+        \item To ensure that the cube of $s$ has no zero bytes in the middle part, we sample random bits (in a range such that $t$ doesn't exceed $\mathsf{0x000x020x00...0x00}$) until the point when there are no zero bytes left.
+    \end{itemize}
 \end{solution}
 
 \prob{3: Attack on RSA PKCS Padding: Bleichenbacher's attack}
