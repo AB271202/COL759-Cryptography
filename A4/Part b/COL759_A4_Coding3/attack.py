@@ -1,4 +1,4 @@
-from rsa import check_padding, encryption
+from rsa import check_padding, encryption, pad
 import math
 """
 Takes a ciphertext, public modulus and public exponent as input as input
@@ -14,22 +14,27 @@ pub_key = (3, 783948438612447530520500845779523629098681116915315373171090024704
 def step2(M, s, B, N, ct, e):
     # Find s
     if len(M) == 1:
-        el = M.pop()
-        a = el[0]
-        b = el[1]
-        r = 2*(b*s - 2*B)//N
-        while True:
-            s1 = (2*B+r*N)//b
-            found = 0
-            while s1 < (3*B+r*N)//a:
-                if check_padding(to_list((ct*pow(s1, e, N)) % N)):
-                    found = 1
+        for (a,b) in M:
+            r = 2*(b*s - 2*B)//N
+            while True:
+                s1 = (2*B+r*N)//b
+                found = 0
+                while s1 < (3*B+r*N)//a:
+                    if check_padding(to_list((ct*pow(s1, e, N)) % N)):
+                        found = 1
+                        break
+                    s1 += 1
+                if found:
                     break
-                s1 += 1
-            if found:
+                else:
+                    r += 1
+    else:
+        print("M has multiple intervals", M.size())
+        s1=s+1
+        while s1 < (3*B):
+            if check_padding(to_list((ct*pow(s1, e, N)) % N)):
                 break
-            else:
-                r += 1
+            s1 += 1
     return s1
 
 
@@ -37,10 +42,11 @@ def step3(s1, M, B, N):
     # Add to the set
     M1 = set()
     for element in M:
-        r = 0
-        a = element[0]
-        b = element[1]
-        while (3*B+r*N)/s1 < b:
+        a,b = element
+        r = (a*s1-3*B+1)//N
+        # print(a,b)
+        while r<=(b*s1-2*B)//N:
+            # print((3*B+r*N)//s1)
             alpha = max(a, math.ceil((2*B+r*N)/s1))
             beta = min(b, math.floor((3*B+r*N)/s1))
             if alpha <= beta:
@@ -50,11 +56,10 @@ def step3(s1, M, B, N):
 
 
 def to_int(cipher_text):
-    ct = 1
+    ct = 0
     for i in cipher_text:
-        ct = 16*ct+i
+        ct = 256*ct+i
     return ct
-
 
 def to_list(ct):
     cipher_text = []
@@ -99,7 +104,9 @@ def attack(cipher_text, N, e):
         if len(M) == 1:
             x = M.pop()
             if x[0] == x[1]:
-                return to_list(M)
+                pm=to_list(M)
+                index=M.find(0)
+                return M[index+1:]
             else:
                 M.add(x)
     """
@@ -109,4 +116,11 @@ def attack(cipher_text, N, e):
 
 
 if __name__ == "__main__":
-    print(attack(encryption([1, 2, 3, 4, 5, 6, 7]), pub_key[1], pub_key[0]))
+    encrypted = encryption(pad([1,2,3,4,5,6,7]))
+    # print(check_padding(encrypted))
+    d=522632292408298353680333897186349086065787411276876915447393349802835019514737046185101844126728564660705937990366007589349628083368588089099766017405588723862803194332061788333764515745015105586168407686329659333562813224856512227
+    m=pow(to_int(encrypted),d,pub_key[1])
+
+    print(m)
+    # print(to_list(m))
+    print(attack(encrypted, pub_key[1], pub_key[0]))

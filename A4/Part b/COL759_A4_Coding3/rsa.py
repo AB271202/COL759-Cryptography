@@ -106,7 +106,7 @@ def get_key(key_file):
         return key_pair
 
 pub_key, priv_key = get_key(KEY_FILE)
-
+# print(priv_key)
 """
 PARAMS:
 msg: a list of integers representing the message to be encrypted
