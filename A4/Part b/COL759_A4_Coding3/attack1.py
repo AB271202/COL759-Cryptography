@@ -1,4 +1,3 @@
-
 # from rsa import check_padding
 import rsa
 
@@ -9,6 +8,11 @@ ciphertext: a list of integers of size 128 bytes
 N: the public modulus of size 128 bytes
 e: the public exponent
 """
+def to_int(cipher_text):
+    ct = 0
+    for i in cipher_text:
+        ct = 256*ct+i
+    return ct
 
 def bin_to_int(s):
     power = 1
@@ -93,14 +97,10 @@ def attack(cipher_text, N, e):
                     continue
 
                 if a_new == b_new:
-                    crackList = list(rsa.num_to_bytes(a_new))
-                    final_msg = []
-                    zeroFound = False
-                    for c in crackList[2:]:
-                        if(zeroFound):
-                            final_msg.append(c)
-                        if(c == 0 and not zeroFound): zeroFound = True
-                    return final_msg
+                    ans = list(rsa.num_to_bytes(a_new))[1:]
+                    id = ans.index(0)
+                    return ans[id+1:]
+                    # return list(rsa.num_to_bytes(a_new))
 
                 M_new.append((a_new, b_new))
                 r += 1
@@ -110,13 +110,32 @@ def attack(cipher_text, N, e):
         print("------------------ FOUND AN S:", s, "Numbered:", i, "-------------------------")
         i += 1
 
+# if __name__=="__main__":
+#     pub_key, priv_key = rsa.get_key('key.pkl')
+#     e, N = pub_key
+#     d = priv_key[0]
+#     msg = 'A message for encryption'
+#     msg1 = list(bytes(msg, 'raw_unicode_escape'))
+#     msg1 = rsa.pad(msg1)
+#     ct = rsa.encryption(msg1)
+#     crack = attack(ct, N, e)
+#     if(crack == msg) : 
+#         print("HO GAYA")
+#     else : 
+#         print("NHI HUA")
 
-# pub_key, priv_key = rsa.get_key('key.pkl')
-# e, N = pub_key
-# d = priv_key[0]
-# msg = 'The elusive firefly performed a dazzling dance in the moonlit meadow,.'
-# msg = list(bytes(msg, 'raw_unicode_escape'))
-# msgChecker = msg
-# msg = rsa.pad(msg)
-# ct = rsa.encryption(msg)
-# print(attack(ct, N, e) == msgChecker)
+
+if __name__ == "__main__":
+    pub_key, priv_key = rsa.get_key('key.pkl')
+    message = [255]*80
+    message = [1,2,3,4,5,6,7,8,9,0,0,123,45,213,23,111,32]
+    encrypted = rsa.encryption(rsa.pad(message))
+    # print(check_padding(encrypted))
+    d=522632292408298353680333897186349086065787411276876915447393349802835019514737046185101844126728564660705937990366007589349628083368588089099766017405588723862803194332061788333764515745015105586168407686329659333562813224856512227
+    m=pow(to_int(encrypted),d,pub_key[1])
+
+    # print(m)
+    # print(to_list(m))
+    result = attack(encrypted, pub_key[1], pub_key[0])
+    print(result)
+    print(message == result)
