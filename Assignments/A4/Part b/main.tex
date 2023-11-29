@@ -1,0 +1,316 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage{mdframed}
+\usepackage{hyperref}
+\usepackage{comment} 
+\usepackage{xparse}
+\usepackage{tcolorbox}
+\usepackage{lipsum} %This package just generates Lorem Ipsum filler text. 
+\usepackage{fullpage} % changes the margin
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\usepackage[fleqn]{amsmath}
+\usepackage{amssymb,amsthm}  % assumes amsmath package installed
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usepackage{verbatim}
+\usepackage[numbered]{mcode}
+\usepackage{float}
+\usepackage{tikz}
+    \usetikzlibrary{shapes,arrows}
+    \usetikzlibrary{arrows,calc,positioning}
+
+    \tikzset{
+        block/.style = {draw, rectangle,
+            minimum height=1cm,
+            minimum width=1.5cm},
+        input/.style = {coordinate,node distance=1cm},
+        output/.style = {coordinate,node distance=4cm},
+        arrow/.style={draw, -latex,node distance=2cm},
+        pinstyle/.style = {pin edge={latex-, black,node distance=2cm}},
+        sum/.style = {draw, circle, node distance=1cm},
+    }
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage[shortlabels]{enumitem}
+\usepackage{indentfirst}
+\usepackage{hyperref}
+\usepackage[capitalize, nameinlink]{cleveref}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+
+% Define the colors for the code highlighting
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Configure the code listing style
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+
+\newenvironment{problem}[2][Problem]
+    { \begin{mdframed}[backgroundcolor=gray!20] \textbf{#1 #2} \\}
+    {  \end{mdframed}}
+
+\newenvironment{reduction}
+    { \begin{mdframed}[backgroundcolor=blue!20] \\}
+    {  \end{mdframed}}
+% Define solution environment
+
+\newcommand{\hr}{\noindent\rule{7in}{2.8pt}}
+\newenvironment{solution}
+    {\textit{Solution:}}
+    {}
+\newcommand{\prob}[1]{\begin{mdframed}[backgroundcolor=gray!20] \textbf{Problem #1}\end{mdframed}}
+\renewcommand{\qed}{\quad\qedsymbol}
+\newcommand{\bit}{\left\{0, 1\right\}}
+\newcommand{\ct}{\mathsf{ct}}
+\newcommand{\hyb}{\mathsf{Hyb}}
+\newcommand{\enc}{\mathsf{Enc}}
+\newcommand{\enct}{\mathsf{Enc-two}}
+\newcommand{\dec}{\mathsf{Dec}}
+\newcommand{\dect}{\mathsf{Dec-two}}
+\newcommand{\negl}{\mathsf{negl}}
+\newcommand{\prf}{\mathsf{PRFAdv}}
+\newcommand{\prg}{\mathsf{PRGAdv}}
+\newcommand{\poly}{\mathsf{poly}}
+\newcommand{\sign}{\mathsf{Sign}}
+\newcommand{\verif}{\mathsf{Verify}}
+\newcommand{\ord}{\mathsf{ord}}
+\newcommand{\ddh}{\mathsf{DDH}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\T}{\mathbb{T}}
+\newcommand{\G}{\mathbb{G}}
+
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calE}{\mathcal{E}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calG}{\mathcal{G}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calI}{\mathcal{I}}
+\newcommand{\calJ}{\mathcal{J}}
+\newcommand{\calK}{\mathcal{K}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calS}{\mathcal{S}}
+\newcommand{\calX}{\mathcal{X}}
+\newcommand{\calY}{\mathcal{Y}}
+\newcommand{\calR}{\mathcal{R}}
+\newcommand{\calT}{\mathcal{T}}
+
+\newcommand{\inparen}[1]{\left{ #1 \right}}
+\newcommand{\probtwo}[2]{\mathsf{Pr}_{#1}\left[ #2 \right]}
+\newcommand{\set}[1]{\left\{ #1 \right\}}
+\newcommand{\twotimessadv}[1]{\mathsf{2SSAdv}\left[ #1 \right]}
+
+\NewDocumentEnvironment{world}{ o }{%
+  \begin{mdframed}[
+    backgroundcolor=blue!10,
+    innertopmargin=15pt,
+    innerbottommargin=15pt,
+    innerleftmargin=15pt,
+    innerrightmargin=15pt,
+  ]%
+  \IfNoValueTF{#1}{%
+    % If no title is provided
+    \centering
+  }{%
+    % If a title is provided
+    \centering\textbf{#1}\par
+  }%
+}{%
+  \end{mdframed}%
+}
+
+\newlength{\protowidth}
+\newcommand{\pprotocol}[5]{
+{\begin{figure*}[#3]
+\begin{center}
+\setlength{\protowidth}{\textwidth}
+\addtolength{\protowidth}{-3\intextsep}
+
+\fbox{
+        \small
+        \hbox{\quad
+        \begin{minipage}{\protowidth}
+    \begin{center}
+    {\bf #1}
+    \end{center}
+        #5
+        \end{minipage}
+        \quad}
+
+        }
+        
+\end{center}
+\vspace{-4ex}
+\caption{{#4} #2}
+\end{figure*}
+} }
+
+% the first arg is name of security game
+% the second arg is caption
+% the third arg is the game description
+% the label needs to be included 
+\newcommand{\securitygame}[4]{
+   \pprotocol{#1}{#2}{ht!}{#3}{#4}
+}
+
+\newcommand{\constr}[4]{
+   \pprotocol{#1}{#2}{tbh!}{#3}{#4}
+}
+
+\begin{document}
+
+\noindent
+\large\textbf{Anish Banerjee, Shankh Gupta} \hfill \textbf{Problem Set - 4 b}   \\
+\normalsize COL759: Cryptography \hfill November 2023\\
+\hr
+
+
+\prob{1: RSA with a low-entropy prime generator}
+\begin{solution}
+    Here, the main idea is that if the prime generator has a low-entropy, it is very likely that two of the sampled $N$ will have a common factor. Since the gcd of two numbers can be calculated efficiently, we can easily factorize the number and thus break RSA.
+    \begin{lstlisting}[language=Python, caption=RSA with a low-entropy prime generator]
+def attack():
+    L=[] # A list for storing N
+    for i in range(200):
+        (N, e), ct = restart_system()
+        for i in L:
+            p=gcd(i,N)
+            if p!=1 and p!=N and p!=N:
+                q=N//p
+                phiN=(p-1)*(q-1)
+                d = inverse(e, phiN)
+                return dec(ct, N, d)
+        L.append(N)
+        \end{lstlisting}
+\end{solution}
+
+\prob{2: Another Attack on RSA Signatures}
+\begin{solution}
+    The attack follows in three steps : 
+    \begin{enumerate}
+        \item Choose a string $s$ so that it's cube doesn't exceed {\tt 0x00 0x01 0x00 ... 0x00} by taking cube root.
+        \item Set the last $|M|+1$ bytes (here $|M|$ denotes size of message in bytes) so that the cube of $s$ (say $t$) has the last $1+|M|$ bytes as {\tt 0x00}$[M]$. To do this, we compare $t$ (cube of $s$) and our target suffix ({\tt 0x00}$[M]$) until we find a mismatch at some position (say $i$), upon which we flip the bit at position $i$ in $s$. This will not alter the previously matching bits and the current bit in $t$ will match the one in our target suffix. We do this until whole of the target suffix is matched in $t$.
+        \item To ensure that the cube of $s$ has no zero bytes in the middle part, we sample random bits (in a range so that $t$ doesn't exceed {\tt 0x00 0x02 0x00 ... 0x00}) until the point when there are no zero bytes left.
+    \end{enumerate}
+\end{solution}
+
+\prob{3: Attack on RSA PKCS Padding: Bleichenbacher's attack}
+\begin{solution}
+    Here we implemented Bleichenbacher's attack as mentioned in \href{https://archiv.infsec.ethz.ch/education/fs08/secsem/bleichenbacher98.pdf}{his paper}. We also referred to \href{https://youtu.be/iA6OevUmeHk?si=m38o_MBNJr53BtM8}{this} video for understanding the attack better.
+    
+    \begin{lstlisting}[language=Python, caption=Bleichenbacher's attack]
+def attack(cipher_text, N, e):
+    ct_bin = ''.join(format(byte, '08b') for byte in cipher_text)
+    k = len(cipher_text)    # number of bytes in the cipher text
+    B = pow(2, 8*(k-2))     # bound
+    M = [(2*B, 3*B-1)]      # set of intervals
+    i = 1                   # number of successful s values found
+    # Implement ceil and floor functions as math library functions don't work for large integers
+    s = ceil(N, (3 * B))
+    while True:
+        min_n = M[0][0]
+        max_n = M[0][1]
+        for r in M: # min_n, max_n based on previous step
+            if r[0] < min_n:
+                min_n = r[0]
+            if r[1] > max_n:
+                max_n = r[1]
+        if (i > 1 and len(M) == 1):     # Step 2.c from the paper 
+            a, b = M[0]
+            r = floor(2*(b*s - 2*B), N)
+            counter = 1
+            while True:
+                s = ceil((2*B + r * N), b)
+                s_max = ceil((3*B + r * N), a)
+                found = False
+                while s <= s_max:
+                    ct_mod = (pow(pow(s, e) * (bin_to_int(ct_bin)), 1, N))
+                    if (rsa.check_padding(rsa.num_to_bytes(ct_mod))) : 
+                        found = True
+                        break
+                    s += 1
+                if found:
+                    break
+                else:
+                    if counter%1000 == 0: print(counter)
+                    counter += 1
+                r += 1
+        else:       # Step 2.a,b from the paper
+            while True:
+                s += 1
+                ct_mod = (pow(pow(s, e) * (bin_to_int(ct_bin)), 1, N))
+                if (rsa.check_padding(rsa.num_to_bytes(ct_mod))) :
+                    break
+        
+        # update the set M (Step 3 from the paper)
+        M_new = []
+
+        for m in M:
+            a, b = m
+            # Compute large values one time
+            r_min = (a*s - 3*B + 1) // N
+            r_max = (b*s - 2*B) // N
+
+            r = r_min
+            while r <= r_max:
+                a_new = max(a, ceil((2*B + r*N), s))
+                b_new = min(b, floor((3*B - 1 + r*N), s))
+                if a_new > b or b_new < a:
+                    r += 1
+                    continue
+
+                if a_new == b_new: # Answer found
+                    crackList = list(rsa.num_to_bytes(a_new))
+                    final_msg = []
+                    zeroFound = False
+                    for c in crackList[2:]:
+                        if(zeroFound):
+                            final_msg.append(c)
+                        if(c == 0 and not zeroFound): zeroFound = True
+                    return final_msg
+                M_new.append((a_new, b_new))
+                r += 1
+        M = M_new
+        i += 1
+    \end{lstlisting}
+
+        
+\end{solution}
+
+\end{document}
